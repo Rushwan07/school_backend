@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const permissionSchema = new mongoose.Schema({
     childId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Child',
+        ref: 'Student',
         required: true
     },
     permissionType: {

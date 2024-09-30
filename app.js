@@ -5,6 +5,12 @@ const express = require("express");
 const userRouter = require("./src/routes/usersRouter");
 const studentRouter = require("./src/routes/studentRouters");
 const attendanceRouter = require("./src/routes/attendanceRouter");
+const permisionRouter = require("./src/routes/permisionRouter");
+const feesRouter = require("./src/routes/feesRouter");
+const reportRouter = require("./src/routes/reportRouter");
+const transportRouter = require("./src/routes/transportationRouter");
+const assesmentRouter = require("./src/routes/assesmentRouter");
+const communicationRouter = require("./src/routes/communicationRouter");
 
 const AppError = require("./src/utils/appError");
 const globalErrorHandler = require("./src/controllers/errorController");
@@ -26,6 +32,12 @@ app.use(express.json());
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/student", studentRouter);
 app.use("/api/v1/attendance", attendanceRouter);
+app.use("/api/v1/permision", permisionRouter);
+app.use("/api/v1/fees", feesRouter);
+app.use("/api/v1/report", reportRouter);
+app.use("/api/v1/transport", transportRouter);
+app.use("/api/v1/assesment", assesmentRouter);
+app.use("/api/v1/communication", communicationRouter);
 
 // Test route to confirm API is running
 app.get("/", (req, res) => {

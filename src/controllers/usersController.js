@@ -52,30 +52,28 @@ exports.signup = catchAsync(async (req, res, next) => {
 
 
 exports.signin = catchAsync(async (req, res, next) => {
-  const { email, password } = req.body;
+  const { email, password, regNo } = req.body;
 
-
-  if (!email || !password) {
-    return next(new AppError("Please enter email and password for login.", 400));
+  if (!email && !regNo || !password) {
+    return next(new AppError("Please enter email or registration number, and password for login.", 400));
   }
 
-
-  const user = await User.findOne({ email });
-
+  // Find user by email or regNo
+  const user = await User.findOne({
+    $or: [{ email }, { regNo }]
+  });
 
   if (!user) {
     return next(new AppError("User not found.", 404));
   }
 
-
   const match = await bcryptjs.compare(password, user.password);
 
-
   if (!match) {
-    return next(new AppError("Incorrect email or password.", 400));
+    return next(new AppError("Incorrect email/registration number or password.", 400));
   }
 
-  user.password = undefined;
+  user.password = undefined; // Remove password from user object
   const token = jwt.sign(
     { id: user._id, role: user.role, email: user.email },
     process.env.JWT_SECRET,

@@ -11,6 +11,11 @@ const reportRouter = require("./src/routes/reportRouter");
 const transportRouter = require("./src/routes/transportationRouter");
 const assesmentRouter = require("./src/routes/assesmentRouter");
 const communicationRouter = require("./src/routes/communicationRouter");
+const classRouter = require("./src/routes/classRouter");
+const extracurricularRouter = require("./src/routes/extracurricularRouter");
+const specialClassRouter = require("./src/routes/specialClassesRouter");
+const timeTableRouter = require("./src/routes/timeTableRouter");
+const invoiceRouter = require("./src/routes/invoiceRouter");
 
 const AppError = require("./src/utils/appError");
 const globalErrorHandler = require("./src/controllers/errorController");
@@ -38,6 +43,11 @@ app.use("/api/v1/report", reportRouter);
 app.use("/api/v1/transport", transportRouter);
 app.use("/api/v1/assesment", assesmentRouter);
 app.use("/api/v1/communication", communicationRouter);
+app.use("/api/v1/class", classRouter);
+app.use("/api/v1/extracurricular", extracurricularRouter);
+app.use("/api/v1/specialclass", specialClassRouter);
+app.use("/api/v1/timetable", timeTableRouter);
+app.use("/api/v1/invoice", invoiceRouter);
 
 // Test route to confirm API is running
 app.get("/", (req, res) => {

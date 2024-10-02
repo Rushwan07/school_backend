@@ -3,49 +3,90 @@ const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 
 exports.postAttendance = catchAsync(async (req, res, next) => {
-    const { studentId, date, status } = req.body;
+    const { userId, date, status } = req.body;
 
-    if (!studentId) {
-        return next(new AppError("Please provide valid student  Id", 400));
+    if (!userId) {
+        return next(new AppError("Please provide a valid user ID.", 400));
     }
 
     if (!date) {
-        return next(new AppError("Please select a valid Date", 400));
+        return next(new AppError("Please select a valid date.", 400));
     }
 
-    if (!status || (status !== "present" && status !== "absent")) {
-        return next(new AppError("Please select a valid status", 400));
+    if (!status || !["present", "absent", "late"].includes(status)) {
+        return next(new AppError("Please select a valid status.", 400));
     }
 
-    const data = await Attendance.create({ studentId, date, status });
+    const attendance = await Attendance.create({ userId, date, status });
     return res.status(201).json({
         status: "success",
-        data: { attendance: data },
+        data: { attendance },
     });
 });
 
 exports.getAttendance = catchAsync(async (req, res, next) => {
-    const attendances = await Attendance.find();
-    if (!attendances) {
-        return next(new AppError("There is no attendence for now", 400));
-    }
-    return res.status(201).json({
+    const attendances = await Attendance.find().populate("userId");
+    return res.status(200).json({
         status: "success",
-        data: { attendance: attendances },
+        data: { attendances },
     });
 });
 
 exports.getAttendanceById = catchAsync(async (req, res, next) => {
     const attendanceId = req.params.id;
-    const attendance = await Attendance.findById(attendanceId).populate(
-        "studentId"
-    );
-    if (!attendance) {
-        return next(new AppError("There is no attendence f", 404));
+
+    if (!mongoose.Types.ObjectId.isValid(attendanceId)) {
+        return next(new AppError("Invalid attendance ID.", 400));
     }
 
-    return res.status(201).json({
+    const attendance = await Attendance.findById(attendanceId).populate("userId");
+    if (!attendance) {
+        return next(new AppError("Attendance not found.", 404));
+    }
+
+    return res.status(200).json({
         status: "success",
-        data: { attendance: attendance },
+        data: { attendance },
+    });
+});
+
+
+exports.updateAttendance = catchAsync(async (req, res, next) => {
+    const attendanceId = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(attendanceId)) {
+        return next(new AppError("Invalid attendance ID.", 400));
+    }
+
+    const attendance = await Attendance.findByIdAndUpdate(attendanceId, req.body, {
+        new: true,
+        runValidators: true,
+    });
+
+    if (!attendance) {
+        return next(new AppError("Attendance not found.", 404));
+    }
+
+    return res.status(200).json({
+        status: "success",
+        data: { attendance },
+    });
+});
+
+exports.deleteAttendance = catchAsync(async (req, res, next) => {
+    const attendanceId = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(attendanceId)) {
+        return next(new AppError("Invalid attendance ID.", 400));
+    }
+
+    const attendance = await Attendance.findByIdAndDelete(attendanceId);
+    if (!attendance) {
+        return next(new AppError("Attendance not found.", 404));
+    }
+
+    return res.status(204).json({
+        status: "success",
+        data: null,
     });
 });

@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const ClassSchema = new Schema(
+const SpecialClassesSchema = new Schema(
     {
-        name: {
-            type: String,
-            required: true, // e.g., 'Grade 1' or 1st standard
+        classId: {
+            type: Schema.Types.ObjectId,
+            required: true,
         },
         description: String,
         subjects: [
@@ -30,4 +30,4 @@ const ClassSchema = new Schema(
     { timestamps: true }
 );
 
-module.exports = mongoose.model("Class", ClassSchema);
+module.exports = mongoose.model("SpecialClasses", SpecialClassesSchema);

@@ -1,14 +1,16 @@
 const express = require('express');
-const transportController = require('../controllers/transportationController'); 
+const transportationController = require('../controllers/transportationController');
 const router = express.Router();
 
-router.route('/')
-    .post(transportController.createTransport) 
-    .get(transportController.getAllTransports); 
+router
+    .route('/')
+    .post(transportationController.createTransportation)
+    .get(transportationController.getAllTransportations);
 
-router.route('/:id')
-    .get(transportController.getTransportById) 
-    .patch(transportController.updateTransport) 
-    .delete(transportController.deleteTransport);
+router
+    .route('/:id')
+    .get(transportationController.getTransportationById)
+    .patch(transportationController.updateTransportation)
+    .delete(transportationController.deleteTransportation);
 
 module.exports = router;

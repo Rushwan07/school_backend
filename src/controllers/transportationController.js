@@ -1,78 +1,80 @@
-const Transport = require('../models/transportationModel'); 
+const Transportations = require('../models/transportationModel');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
-// Create a new transport entry
-exports.createTransport = catchAsync(async (req, res) => {
-    const { childId, transportType, pickupLocation, dropoffLocation, emergencyContact } = req.body;
-    const newTransport = new Transport({
-        childId,
-        transportType,
-        pickupLocation,
-        dropoffLocation,
-        emergencyContact
-    });
-    await newTransport.save();
+// Create a new transportation entry
+exports.createTransportation = catchAsync(async (req, res, next) => {
+    const { busNumber, stops, students } = req.body;
+
+    const newTransportation = await Transportations.create({ busNumber, stops, students });
+
     res.status(201).json({
         status: 'success',
         data: {
-            transport: newTransport,
+            transportation: newTransportation,
         },
     });
 });
 
-// Get all transport entries
-exports.getAllTransports = catchAsync(async (req, res) => {
-    const transports = await Transport.find().populate('childId').populate('emergencyContact');
-    res.status(200).json({
-        status: 'success',
-        results: transports.length,
-        data: {
-            transports,
-        },
-    });
-});
+// Get all transportation entries
+exports.getAllTransportations = catchAsync(async (req, res, next) => {
+    const transportations = await Transportations.find().populate('students');
 
-// Get a single transport entry by ID
-exports.getTransportById = catchAsync(async (req, res, next) => {
-    const transport = await Transport.findById(req.params.id).populate('childId').populate('emergencyContact');
-    if (!transport) {
-        return next(new AppError('Transport entry not found', 404));
-    }
     res.status(200).json({
         status: 'success',
         data: {
-            transport,
+            transportations,
         },
     });
 });
 
-// Update a transport entry
-exports.updateTransport = catchAsync(async (req, res, next) => {
-    const { childId, transportType, pickupLocation, dropoffLocation, emergencyContact } = req.body;
-    const updatedTransport = await Transport.findByIdAndUpdate(
-        req.params.id,
-        { childId, transportType, pickupLocation, dropoffLocation, emergencyContact },
-        { new: true, runValidators: true }
-    ).populate('childId').populate('emergencyContact');
+// Get a transportation entry by ID
+exports.getTransportationById = catchAsync(async (req, res, next) => {
+    const transportationId = req.params.id;
 
-    if (!updatedTransport) {
-        return next(new AppError('Transport entry not found', 404));
+    const transportation = await Transportations.findById(transportationId).populate('students');
+    if (!transportation) {
+        return next(new AppError('Transportation entry not found', 404));
     }
+
     res.status(200).json({
         status: 'success',
         data: {
-            transport: updatedTransport,
+            transportation,
         },
     });
 });
 
-// Delete a transport entry
-exports.deleteTransport = catchAsync(async (req, res, next) => {
-    const deletedTransport = await Transport.findByIdAndDelete(req.params.id);
-    if (!deletedTransport) {
-        return next(new AppError('Transport entry not found', 404));
+// Update a transportation entry
+exports.updateTransportation = catchAsync(async (req, res, next) => {
+    const transportationId = req.params.id;
+
+    const updatedTransportation = await Transportations.findByIdAndUpdate(transportationId, req.body, {
+        new: true,
+        runValidators: true,
+    });
+
+    if (!updatedTransportation) {
+        return next(new AppError('Transportation entry not found', 404));
     }
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            transportation: updatedTransportation,
+        },
+    });
+});
+
+// Delete a transportation entry
+exports.deleteTransportation = catchAsync(async (req, res, next) => {
+    const transportationId = req.params.id;
+
+    const deletedTransportation = await Transportations.findByIdAndDelete(transportationId);
+    if (!deletedTransportation) {
+        return next(new AppError('Transportation entry not found', 404));
+    }
+
     res.status(204).json({
         status: 'success',
         data: null,

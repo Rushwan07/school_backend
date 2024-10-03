@@ -16,6 +16,12 @@ const extracurricularRouter = require("./src/routes/extracurricularRouter");
 const specialClassRouter = require("./src/routes/specialClassesRouter");
 const timeTableRouter = require("./src/routes/timeTableRouter");
 const invoiceRouter = require("./src/routes/invoiceRouter");
+const subjectRouter = require("./src/routes/subjectRouter");
+const teacherRouter = require("./src/routes/teacherRouter");
+const parentRouter = require("./src/routes/parentRouter");
+const announcementRouter = require("./src/routes/announcementRouter");
+const gradetRouter = require("./src/routes/gradeRouter");
+const resultRouter = require("./src/routes/resultRouter");
 
 const AppError = require("./src/utils/appError");
 const globalErrorHandler = require("./src/controllers/errorController");
@@ -48,6 +54,12 @@ app.use("/api/v1/extracurricular", extracurricularRouter);
 app.use("/api/v1/specialclass", specialClassRouter);
 app.use("/api/v1/timetable", timeTableRouter);
 app.use("/api/v1/invoice", invoiceRouter);
+app.use("/api/v1/subject", subjectRouter);
+app.use("/api/v1/teacher", teacherRouter);
+app.use("/api/v1/parent", parentRouter);
+app.use("/api/v1/announcement", announcementRouter);
+app.use("/api/v1/grade", gradetRouter);
+app.use("/api/v1/result", resultRouter);
 
 // Test route to confirm API is running
 app.get("/", (req, res) => {

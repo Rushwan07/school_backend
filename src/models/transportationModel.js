@@ -1,27 +1,42 @@
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
 
-const TransportationsSchema = new Schema(
-    {
-        busNumber: {
-            type: String,
-            required: true, // e.g., 'Grade 1' or 1st standard
-        },
-
-        stops: [
-            {
+const transportSchema = new mongoose.Schema({
+    busNumber: {
+        type: Number,
+        required: true,
+    },
+    stops: [
+        {
+            stopNumber: {
+                type: Number,
+                required: true,
+            },
+            place: {
                 type: String,
                 required: true,
             },
-        ],
-        students: [
-            {
-                type: Schema.Types.ObjectId,
-                ref: "User", // List of students in this class
+            time: {
+                type: Date,
+                required: true,
             },
-        ],
+            transportationFees: {
+                type: String,
+                required: true,
+            },
+        },
+    ],
+    driverName: {
+        type: String,
+        required: true,
     },
-    { timestamps: true }
-);
+    students: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Student",
+        },
+    ],
+});
 
-module.exports = mongoose.model("Transportations", TransportationsSchema);
+const Transport = mongoose.model("Transport", transportSchema);
+
+module.exports = Transport;

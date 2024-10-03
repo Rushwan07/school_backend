@@ -1,30 +1,30 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const feeSchema = new mongoose.Schema({
-    childId: {
+const FeesSchema = new mongoose.Schema({
+    studentId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Student',
-        required: true
+        ref: "Student",
     },
-    feeType: {
-        type: String,
-        enum: ['tuition', 'transport', 'other'],
-        required: true
-    },
-    amount: {
+    baseFees: {
         type: Number,
-        required: true
+        required: true,
+    },
+    transportationFees: {
+        type: Number,
+        required: true,
+    },
+    totalFees: {
+        type: Number,
+        required: true,
     },
     paid: {
         type: Boolean,
-        default: false
+        default: false,
     },
     dueDate: {
         type: Date,
-        required: true
-    }
+        required: true,
+    },
 });
 
-const Fee = mongoose.model('Fee', feeSchema);
-
-module.exports = Fee;
+module.exports = mongoose.model("Fees", FeesSchema);

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const extraCurricularAcctivitiesSchema = new mongoose.Schema({
+const eventSchema = new mongoose.Schema({
     title: {
         type: String,
         required: true,
@@ -9,9 +9,13 @@ const extraCurricularAcctivitiesSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-
-    fees: {
-        type: String,
+    startTime: {
+        type: Date,
+        required: true,
+    },
+    endTime: {
+        type: Date,
+        required: true,
     },
     classId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -19,7 +23,4 @@ const extraCurricularAcctivitiesSchema = new mongoose.Schema({
     },
 });
 
-module.exports = mongoose.model(
-    "ExtraCurricularAcctivities",
-    extraCurricularAcctivitiesSchema
-);
+module.exports = mongoose.model("Event", eventSchema);

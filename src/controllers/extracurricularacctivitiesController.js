@@ -1,77 +1,88 @@
-const catchAsync = require("../utils/catchAsync");
+const mongoose = require("mongoose");
+const ExtraCurricularActivity = require("../models/extracurricularacctivitiesModel");
 const AppError = require("../utils/appError");
-const ExtraCurricularActivities = require("../models/extracurricularacctivitiesModel");
+const catchAsync = require("../utils/catchAsync");
 
-// Create a new activity
-exports.createActivity = catchAsync(async (req, res, next) => {
-    const { name, description, students, fees } = req.body;
+// Create a new extracurricular activity
+exports.createExtraCurricularActivity = catchAsync(async (req, res, next) => {
+    const { title, description, fees, classId } = req.body;
 
-    const newActivity = await ExtraCurricularActivities.create({ name, description, students, fees });
+    const activity = await ExtraCurricularActivity.create({ title, description, fees, classId });
 
-    res.status(201).json({
+    return res.status(201).json({
         status: "success",
-        data: {
-            activity: newActivity,
-        },
+        data: { activity },
     });
 });
 
-// Get all activities
-exports.getAllActivities = catchAsync(async (req, res, next) => {
-    const activities = await ExtraCurricularActivities.find().populate('students');
+// Get all extracurricular activities
+exports.getAllExtraCurricularActivities = catchAsync(async (req, res, next) => {
+    const activities = await ExtraCurricularActivity.find().populate("classId");
 
-    res.status(200).json({
+    return res.status(200).json({
         status: "success",
-        data: {
-            activities,
-        },
+        data: { activities },
     });
 });
 
-// Get a single activity by ID
-exports.getActivityById = catchAsync(async (req, res, next) => {
-    const activity = await ExtraCurricularActivities.findById(req.params.id).populate('students');
+// Get an extracurricular activity by ID
+exports.getExtraCurricularActivityById = catchAsync(async (req, res, next) => {
+    const activityId = req.params.id;
 
-    if (!activity) {
-        return next(new AppError("No activity found with that ID", 404));
+    if (!mongoose.Types.ObjectId.isValid(activityId)) {
+        return next(new AppError("Invalid activity ID.", 400));
     }
 
-    res.status(200).json({
+    const activity = await ExtraCurricularActivity.findById(activityId).populate("classId");
+
+    if (!activity) {
+        return next(new AppError("Activity not found.", 404));
+    }
+
+    return res.status(200).json({
         status: "success",
-        data: {
-            activity,
-        },
+        data: { activity },
     });
 });
 
-// Update an activity
-exports.updateActivity = catchAsync(async (req, res, next) => {
-    const activity = await ExtraCurricularActivities.findByIdAndUpdate(req.params.id, req.body, {
+// Update an extracurricular activity
+exports.updateExtraCurricularActivity = catchAsync(async (req, res, next) => {
+    const activityId = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(activityId)) {
+        return next(new AppError("Invalid activity ID.", 400));
+    }
+
+    const activity = await ExtraCurricularActivity.findByIdAndUpdate(activityId, req.body, {
         new: true,
         runValidators: true,
     });
 
     if (!activity) {
-        return next(new AppError("No activity found with that ID", 404));
+        return next(new AppError("Activity not found.", 404));
     }
 
-    res.status(200).json({
+    return res.status(200).json({
         status: "success",
-        data: {
-            activity,
-        },
+        data: { activity },
     });
 });
 
-// Delete an activity
-exports.deleteActivity = catchAsync(async (req, res, next) => {
-    const activity = await ExtraCurricularActivities.findByIdAndDelete(req.params.id);
+// Delete an extracurricular activity
+exports.deleteExtraCurricularActivity = catchAsync(async (req, res, next) => {
+    const activityId = req.params.id;
 
-    if (!activity) {
-        return next(new AppError("No activity found with that ID", 404));
+    if (!mongoose.Types.ObjectId.isValid(activityId)) {
+        return next(new AppError("Invalid activity ID.", 400));
     }
 
-    res.status(204).json({
+    const activity = await ExtraCurricularActivity.findByIdAndDelete(activityId);
+
+    if (!activity) {
+        return next(new AppError("Activity not found.", 404));
+    }
+
+    return res.status(204).json({
         status: "success",
         data: null,
     });

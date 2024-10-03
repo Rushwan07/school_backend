@@ -10,7 +10,6 @@ const feesRouter = require("./src/routes/feesRouter");
 const reportRouter = require("./src/routes/reportRouter");
 const transportRouter = require("./src/routes/transportationRouter");
 const assesmentRouter = require("./src/routes/assesmentRouter");
-const communicationRouter = require("./src/routes/communicationRouter");
 const classRouter = require("./src/routes/classRouter");
 const extracurricularRouter = require("./src/routes/extracurricularRouter");
 const specialClassRouter = require("./src/routes/specialClassesRouter");
@@ -22,6 +21,10 @@ const parentRouter = require("./src/routes/parentRouter");
 const announcementRouter = require("./src/routes/announcementRouter");
 const gradetRouter = require("./src/routes/gradeRouter");
 const resultRouter = require("./src/routes/resultRouter");
+const examRouter = require("./src/routes/examRouter");
+const eventRouter = require("./src/routes/eventRouter");
+const lessonRouter = require("./src/routes/lessonRouter");
+const assignmentRouter = require("./src/routes/assignmentRouter");
 
 const AppError = require("./src/utils/appError");
 const globalErrorHandler = require("./src/controllers/errorController");
@@ -48,7 +51,6 @@ app.use("/api/v1/fees", feesRouter);
 app.use("/api/v1/report", reportRouter);
 app.use("/api/v1/transport", transportRouter);
 app.use("/api/v1/assesment", assesmentRouter);
-app.use("/api/v1/communication", communicationRouter);
 app.use("/api/v1/class", classRouter);
 app.use("/api/v1/extracurricular", extracurricularRouter);
 app.use("/api/v1/specialclass", specialClassRouter);
@@ -60,6 +62,10 @@ app.use("/api/v1/parent", parentRouter);
 app.use("/api/v1/announcement", announcementRouter);
 app.use("/api/v1/grade", gradetRouter);
 app.use("/api/v1/result", resultRouter);
+app.use("/api/v1/exam", examRouter);
+app.use("/api/v1/event", eventRouter);
+app.use("/api/v1/lesson", lessonRouter);
+app.use("/api/v1/assignment", assignmentRouter);
 
 // Test route to confirm API is running
 app.get("/", (req, res) => {

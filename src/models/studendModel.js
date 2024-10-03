@@ -1,59 +1,75 @@
 const mongoose = require("mongoose");
 
-const emergencyContactSchema = new mongoose.Schema({
+const studentSchema = new mongoose.Schema({
+    regno: {
+        type: String,
+        required: true,
+        unique: true,
+    },
     name: {
         type: String,
         required: true,
     },
-    relationship: {
-        type: String,
-        required: true,
-    },
-    phone: {
-        type: String,
-        required: true,
-    },
-});
 
-const studentSchema = new mongoose.Schema(
-    {
-        firstName: {
-            type: String,
-            required: [true, "Please enter the child's first name."],
-        },
-        lastName: {
-            type: String,
-            required: [true, "Please enter the child's last name."],
-        },
-        dateOfBirth: {
-            type: Date,
-            required: [true, "Please enter the child's date of birth."],
-        },
-        gender: {
-            type: String,
-            enum: ["male", "female", "other"],
-            required: [true, "Please specify the child's gender."],
-        },
-        registrationDate: {
-            type: Date,
-            default: Date.now,
-        },
-        parentId: {
+    address: {
+        type: String,
+        required: true,
+    },
+    img: {
+        type: String,
+    },
+    bloodType: {
+        type: String,
+    },
+    sex: {
+        type: String,
+        enum: ["MALE", "FEMALE"],
+        required: true,
+    },
+    parentId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Parent",
+        required: true,
+    },
+    classId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Class",
+        required: true,
+    },
+    gradeId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Grade",
+        required: true,
+    },
+    attendances: [
+        {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-            required: [true, "Parent ID is required."],
+            ref: "Attendance",
         },
-        medicalInfo: {
-            type: String, 
+    ],
+    results: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Result",
         },
-        emergencyContacts: [emergencyContactSchema], 
-        permissions: {
-            type: [String], 
+    ],
+    birthday: {
+        type: Date,
+        required: true,
+    },
+    transportations: {
+        pickupLocation: {
+            type: String,
+        },
+        dropOffLocation: {
+            type: String,
+        },
+        busNumber: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Transportation",
         },
     },
-    { timestamps: true }
-);
 
-const Student = mongoose.model("Student", studentSchema);
+}, { timestamps: true });
 
-module.exports = Student;
+module.exports = mongoose.model("Student", studentSchema);

@@ -1,33 +1,47 @@
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
 
-const ClassSchema = new Schema(
-    {
-        name: {
-            type: String,
-            required: true, // e.g., 'Grade 1' or 1st standard
-        },
-        description: String,
-        subjects: [
-            {
-                name: {
-                    type: String,
-                    required: true,
-                },
-                staff: {
-                    type: Schema.Types.ObjectId, // particular staff id for this subject
-                    ref: "User",
-                },
-            },
-        ],
-        students: [
-            {
-                type: Schema.Types.ObjectId,
-                ref: "User", // List of students in this class
-            },
-        ],
+const classSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true,
+        unique: true,
     },
-    { timestamps: true }
-);
+    capacity: {
+        type: Number,
+        required: true,
+    },
+    supervisorId: {
+        type: String,
+    },
+    lessons: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Lesson",
+        },
+    ],
+    students: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Student",
+        },
+    ],
 
-module.exports = mongoose.model("Class", ClassSchema);
+    events: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Event",
+        },
+    ],
+    announcements: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Announcement",
+        },
+    ],
+    baseFees: {
+        type: Number,
+        required: true,
+    },
+});
+
+module.exports = mongoose.model("Class", classSchema);

@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const resultSchema = new mongoose.Schema({
+    // We should add the class instead of assignment
     score: {
         type: Number,
         required: true,

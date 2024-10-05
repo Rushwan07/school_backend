@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const examSchema = new mongoose.Schema({
+    // SHould be add class as well
     title: {
         type: String,
         required: true,

@@ -1,80 +1,89 @@
-const Fee = require('../models/feeModel');
-const AppError = require('../utils/appError');
-const catchAsync = require('../utils/catchAsync');
+const mongoose = require("mongoose");
+const Fees = require("../models/feeModel");
+const AppError = require("../utils/appError");
+const catchAsync = require("../utils/catchAsync");
 
-// Create a new fee
-exports.createFee = catchAsync(async (req, res) => {
-    const { childId, feeType, amount, paid, dueDate } = req.body;
-    const newFee = new Fee({
-        childId,
-        feeType,
-        amount,
-        paid,
-        dueDate
-    });
-    await newFee.save();
-    res.status(201).json({
-        status: 'success',
-        data: {
-            fee: newFee,
-        },
+// Create a new fees record
+exports.createFees = catchAsync(async (req, res, next) => {
+    const { studentId, baseFees, transportationFees, totalFees, dueDate } = req.body;
+
+    const fees = await Fees.create({ studentId, baseFees, transportationFees, totalFees, dueDate });
+
+    return res.status(201).json({
+        status: "success",
+        data: { fees },
     });
 });
 
-// Get all fees
-exports.getAllFees = catchAsync(async (req, res) => {
-    const fees = await Fee.find().populate('childId');
-    res.status(200).json({
-        status: 'success',
-        results: fees.length,
-        data: {
-            fees,
-        },
+// Get all fees records
+exports.getAllFees = catchAsync(async (req, res, next) => {
+    const fees = await Fees.find().populate("studentId");
+
+    return res.status(200).json({
+        status: "success",
+        data: { fees },
     });
 });
 
-// Get a single fee by ID
-exports.getFeeById = catchAsync(async (req, res, next) => {
-    const fee = await Fee.findById(req.params.id).populate('childId');
-    if (!fee) {
-        return next(new AppError('Fee not found', 404));
+// Get a fees record by ID
+exports.getFeesById = catchAsync(async (req, res, next) => {
+    const feesId = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(feesId)) {
+        return next(new AppError("Invalid fees ID.", 400));
     }
-    res.status(200).json({
-        status: 'success',
-        data: {
-            fee,
-        },
+
+    const fees = await Fees.findById(feesId).populate("studentId");
+
+    if (!fees) {
+        return next(new AppError("Fees record not found.", 404));
+    }
+
+    return res.status(200).json({
+        status: "success",
+        data: { fees },
     });
 });
 
-// Update a fee
-exports.updateFee = catchAsync(async (req, res, next) => {
-    const { childId, feeType, amount, paid, dueDate } = req.body;
-    const updatedFee = await Fee.findByIdAndUpdate(
-        req.params.id,
-        { childId, feeType, amount, paid, dueDate },
-        { new: true, runValidators: true }
-    ).populate('childId');
+// Update a fees record
+exports.updateFees = catchAsync(async (req, res, next) => {
+    const feesId = req.params.id;
 
-    if (!updatedFee) {
-        return next(new AppError('Fee not found', 404));
+    if (!mongoose.Types.ObjectId.isValid(feesId)) {
+        return next(new AppError("Invalid fees ID.", 400));
     }
-    res.status(200).json({
-        status: 'success',
-        data: {
-            fee: updatedFee,
-        },
+
+    const fees = await Fees.findByIdAndUpdate(feesId, req.body, {
+        new: true,
+        runValidators: true,
+    });
+
+    if (!fees) {
+        return next(new AppError("Fees record not found.", 404));
+    }
+
+    return res.status(200).json({
+        status: "success",
+        data: { fees },
     });
 });
 
-// Delete a fee
-exports.deleteFee = catchAsync(async (req, res, next) => {
-    const deletedFee = await Fee.findByIdAndDelete(req.params.id);
-    if (!deletedFee) {
-        return next(new AppError('Fee not found', 404));
+// Delete a fees record
+exports.deleteFees = catchAsync(async (req, res, next) => {
+    const feesId = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(feesId)) {
+        return next(new AppError("Invalid fees ID.", 400));
     }
-    res.status(204).json({
-        status: 'success',
+
+    const fees = await Fees.findByIdAndDelete(feesId);
+
+    if (!fees) {
+        return next(new AppError("Fees record not found.", 404));
+    }
+
+    return res.status(204).json({
+        status: "success",
         data: null,
     });
 });

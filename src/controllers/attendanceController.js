@@ -1,23 +1,16 @@
+const mongoose = require("mongoose");
 const Attendance = require("../models/attendanceModel");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 
 exports.postAttendance = catchAsync(async (req, res, next) => {
-    const { userId, date, status } = req.body;
+    const { studentId, date, present, subjectId } = req.body;
 
-    if (!userId) {
-        return next(new AppError("Please provide a valid user ID.", 400));
+    if (!studentId || !date || present === undefined || !subjectId) {
+        return next(new AppError("Please provide valid data.", 400));
     }
 
-    if (!date) {
-        return next(new AppError("Please select a valid date.", 400));
-    }
-
-    if (!status || !["present", "absent", "late"].includes(status)) {
-        return next(new AppError("Please select a valid status.", 400));
-    }
-
-    const attendance = await Attendance.create({ userId, date, status });
+    const attendance = await Attendance.create({ studentId, date, present, subjectId });
     return res.status(201).json({
         status: "success",
         data: { attendance },
@@ -25,7 +18,7 @@ exports.postAttendance = catchAsync(async (req, res, next) => {
 });
 
 exports.getAttendance = catchAsync(async (req, res, next) => {
-    const attendances = await Attendance.find().populate("userId");
+    const attendances = await Attendance.find().populate("studentId subjectId");
     return res.status(200).json({
         status: "success",
         data: { attendances },
@@ -39,7 +32,7 @@ exports.getAttendanceById = catchAsync(async (req, res, next) => {
         return next(new AppError("Invalid attendance ID.", 400));
     }
 
-    const attendance = await Attendance.findById(attendanceId).populate("userId");
+    const attendance = await Attendance.findById(attendanceId).populate("studentId subjectId");
     if (!attendance) {
         return next(new AppError("Attendance not found.", 404));
     }
@@ -49,7 +42,6 @@ exports.getAttendanceById = catchAsync(async (req, res, next) => {
         data: { attendance },
     });
 });
-
 
 exports.updateAttendance = catchAsync(async (req, res, next) => {
     const attendanceId = req.params.id;

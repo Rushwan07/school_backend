@@ -1,82 +1,89 @@
-const Transportations = require('../models/transportationModel');
-const AppError = require('../utils/appError');
-const catchAsync = require('../utils/catchAsync');
+const mongoose = require("mongoose");
+const Transport = require("../models/transportationModel");
+const AppError = require("../utils/appError");
+const catchAsync = require("../utils/catchAsync");
 
-// Create a new transportation entry
-exports.createTransportation = catchAsync(async (req, res, next) => {
-    const { busNumber, stops, students } = req.body;
+// Create a new transport record
+exports.createTransport = catchAsync(async (req, res, next) => {
+    const { busNumber, stops, driverName, students } = req.body;
 
-    const newTransportation = await Transportations.create({ busNumber, stops, students });
+    const transport = await Transport.create({ busNumber, stops, driverName, students });
 
-    res.status(201).json({
-        status: 'success',
-        data: {
-            transportation: newTransportation,
-        },
+    return res.status(201).json({
+        status: "success",
+        data: { transport },
     });
 });
 
-// Get all transportation entries
-exports.getAllTransportations = catchAsync(async (req, res, next) => {
-    const transportations = await Transportations.find().populate('students');
+// Get all transport records
+exports.getAllTransports = catchAsync(async (req, res, next) => {
+    const transports = await Transport.find().populate("students");
 
-    res.status(200).json({
-        status: 'success',
-        data: {
-            transportations,
-        },
+    return res.status(200).json({
+        status: "success",
+        data: { transports },
     });
 });
 
-// Get a transportation entry by ID
-exports.getTransportationById = catchAsync(async (req, res, next) => {
-    const transportationId = req.params.id;
+// Get a transport record by ID
+exports.getTransportById = catchAsync(async (req, res, next) => {
+    const transportId = req.params.id;
 
-    const transportation = await Transportations.findById(transportationId).populate('students');
-    if (!transportation) {
-        return next(new AppError('Transportation entry not found', 404));
+    if (!mongoose.Types.ObjectId.isValid(transportId)) {
+        return next(new AppError("Invalid transport ID.", 400));
     }
 
-    res.status(200).json({
-        status: 'success',
-        data: {
-            transportation,
-        },
+    const transport = await Transport.findById(transportId).populate("students");
+
+    if (!transport) {
+        return next(new AppError("Transport not found.", 404));
+    }
+
+    return res.status(200).json({
+        status: "success",
+        data: { transport },
     });
 });
 
-// Update a transportation entry
-exports.updateTransportation = catchAsync(async (req, res, next) => {
-    const transportationId = req.params.id;
+// Update a transport record
+exports.updateTransport = catchAsync(async (req, res, next) => {
+    const transportId = req.params.id;
 
-    const updatedTransportation = await Transportations.findByIdAndUpdate(transportationId, req.body, {
+    if (!mongoose.Types.ObjectId.isValid(transportId)) {
+        return next(new AppError("Invalid transport ID.", 400));
+    }
+
+    const transport = await Transport.findByIdAndUpdate(transportId, req.body, {
         new: true,
         runValidators: true,
     });
 
-    if (!updatedTransportation) {
-        return next(new AppError('Transportation entry not found', 404));
+    if (!transport) {
+        return next(new AppError("Transport not found.", 404));
     }
 
-    res.status(200).json({
-        status: 'success',
-        data: {
-            transportation: updatedTransportation,
-        },
+    return res.status(200).json({
+        status: "success",
+        data: { transport },
     });
 });
 
-// Delete a transportation entry
-exports.deleteTransportation = catchAsync(async (req, res, next) => {
-    const transportationId = req.params.id;
+// Delete a transport record
+exports.deleteTransport = catchAsync(async (req, res, next) => {
+    const transportId = req.params.id;
 
-    const deletedTransportation = await Transportations.findByIdAndDelete(transportationId);
-    if (!deletedTransportation) {
-        return next(new AppError('Transportation entry not found', 404));
+    if (!mongoose.Types.ObjectId.isValid(transportId)) {
+        return next(new AppError("Invalid transport ID.", 400));
     }
 
-    res.status(204).json({
-        status: 'success',
+    const transport = await Transport.findByIdAndDelete(transportId);
+
+    if (!transport) {
+        return next(new AppError("Transport not found.", 404));
+    }
+
+    return res.status(204).json({
+        status: "success",
         data: null,
     });
 });

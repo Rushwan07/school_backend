@@ -1,15 +1,18 @@
 const express = require("express");
-const extracurricular = require("../controllers/extracurricularacctivitiesController");
-
+const extraCurricularController = require("../controllers/extracurricularacctivitiesController");
 const router = express.Router();
 
-router.route("/")
-    .post(extracurricular.createActivity)
-    .get(extracurricular.getAllActivities);
 
-router.route("/:id")
-    .get(extracurricular.getActivityById)
-    .patch(extracurricular.updateActivity)
-    .delete(extracurricular.deleteActivity);
+router
+    .route("/")
+    .post(extraCurricularController.createExtraCurricularActivity)
+    .get(extraCurricularController.getAllExtraCurricularActivities);
 
-module.exports = router;
+
+router
+    .route("/:id")
+    .get(extraCurricularController.getExtraCurricularActivityById)
+    .patch(extraCurricularController.updateExtraCurricularActivity)
+    .delete(extraCurricularController.deleteExtraCurricularActivity);
+
+module.exports = router

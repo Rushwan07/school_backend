@@ -12,6 +12,10 @@ const resultSchema = new mongoose.Schema({
             assignmentMark: {
                 type: Number,
             },
+            grade: {
+                type: String,
+                required: true,
+            },
         },
     ],
     total: {
@@ -23,7 +27,11 @@ const resultSchema = new mongoose.Schema({
         ref: "Exam",
         required: true,
     },
-
+    classId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Class",
+        required: true,
+    },
     studentId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Student",

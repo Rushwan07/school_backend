@@ -41,18 +41,23 @@ const studentSchema = new mongoose.Schema({
     //     ref: "Grade",
     //     required: true,
     // },
-    attendances: [
+    // attendances: [
+    //     {
+    //         type: mongoose.Schema.Types.ObjectId,
+    //         ref: "Attendance",
+    //     },
+    // ],
+    absentDays: [
         {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Attendance",
+            type: Date,
         },
     ],
-    results: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Result",
-        },
-    ],
+    // results: [
+    //     {
+    //         type: mongoose.Schema.Types.ObjectId,
+    //         ref: "Result",
+    //     },
+    // ],
     birthday: {
         type: Date,
         required: true,

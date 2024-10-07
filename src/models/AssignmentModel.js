@@ -5,17 +5,22 @@ const assignmentSchema = new mongoose.Schema({
     startDate: { type: Date, required: true },
     dueDate: { type: Date, required: true },
     description: { type: String, required: true },
+    classId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Class",
+        required: true,
+    },
     subjectId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Subject",
         required: true,
     },
-    results: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Result",
-        },
-    ],
+    // results: [
+    //     {
+    //         type: mongoose.Schema.Types.ObjectId,
+    //         ref: "Result",
+    //     },
+    // ],
 });
 
 module.exports = mongoose.model("Assignment", assignmentSchema);

@@ -5,20 +5,24 @@ const attendanceSchema = new mongoose.Schema({
         type: Date,
         required: true,
     },
-    present: {
-        type: Boolean,
-        default: true,
-    },
-    studentId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Student",
-        required: true,
-    },
     classId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Class",
         required: true,
     },
+    students: [
+        {
+            studentId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Student",
+                required: true,
+            },
+            atendance: {
+                type: Boolean,
+                default: true,
+            },
+        },
+    ],
 });
 
 module.exports = mongoose.model("Attendance", attendanceSchema);

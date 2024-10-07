@@ -10,29 +10,30 @@ const classSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
-    supervisorId: {
-        type: String,
+    teacherId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Teacher",
     },
-    lessons: [
+    subjectsId: [
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Lesson",
+            ref: "Subjects",
         },
     ],
-    students: [
+    studentsId: [
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Student",
         },
     ],
 
-    events: [
+    eventId: [
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Event",
         },
     ],
-    announcements: [
+    announcementId: [
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Announcement",

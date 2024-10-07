@@ -4,6 +4,16 @@ const FeesSchema = new mongoose.Schema({
     studentId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Student",
+        required: true,
+    },
+    regNo: {
+        type: String,
+        required: true,
+    },
+    classId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Class",
+        required: true,
     },
     baseFees: {
         type: Number,
@@ -17,7 +27,7 @@ const FeesSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
-    paid: {
+    isPaid: {
         type: Boolean,
         default: false,
     },

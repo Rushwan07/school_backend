@@ -1,13 +1,16 @@
 const mongoose = require("mongoose");
 
 const extraCurricularAcctivitiesSchema = new mongoose.Schema({
-    title: {
+    name: {
         type: String,
         required: true,
     },
     description: {
         type: String,
         required: true,
+    },
+    duedate: {
+        type: Date,
     },
 
     fees: {

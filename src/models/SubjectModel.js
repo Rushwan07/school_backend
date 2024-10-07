@@ -19,11 +19,11 @@ const subjectSchema = new mongoose.Schema({
     //     required: true,
     // },
 
-    classId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Class",
-        required: true,
-    },
+    // classId: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "Class",
+    //     required: true,
+    // },
     teacherId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Teacher",
@@ -37,11 +37,8 @@ const subjectSchema = new mongoose.Schema({
     ],
     lessions: [
         {
-            name: { type: String, required: true },
-            description: {
-                type: String,
-                required: true,
-            },
+            type: String,
+            required: true,
         },
     ],
     assignments: [

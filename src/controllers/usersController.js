@@ -1,102 +1,118 @@
-const dotenv = require("dotenv");
 const catchAsync = require("../utils/catchAsync");
 const jwt = require("jsonwebtoken");
-const bcryptjs = require("bcryptjs");
-const User = require("../models/userModel");
-const AppError = require("../utils/appError");
-
+const dotenv = require("dotenv");
 dotenv.config();
 
-exports.signup = catchAsync(async (req, res, next) => {
-  const { email, name, password, contactNumber, role, address, regNo } = req.body;
+const bcryptjs = require("bcryptjs");
 
+const Student = require("../models/StudentModel");
+const Teacher = require("../models/TeacherModel");
+const Admin = require("../models/AdminModel");
 
-  const user = await User.findOne({ email });
-  if (user) {
-    return next(new AppError("Email is already in use.", 400));
-  }
-
-
-  const hashedPassword = await bcryptjs.hash(password, 8);
-
-
-  const newUser = await User.create({
-    email,
-    name,
-    password: hashedPassword,
-    contactNumber,
-    role,
-    address,
-    regNo
-  });
-
-
-  const token = jwt.sign(
-    { id: newUser._id, role: newUser.role, email: newUser.email },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: process.env.LOGIN_EXPIRES,
-    },
-  );
-
-  newUser.password = undefined;
-
-  res.status(201).json({
-    status: "success",
-    token,
-    data: {
-      user: newUser,
-    },
-  });
-});
-
+const AppError = require("../utils/appError");
 
 exports.signin = catchAsync(async (req, res, next) => {
-  const { email, password, regNo } = req.body;
+    const { regNo, username, password } = req.body;
+    //student login
+    if (regNo) {
+        const student = await Student.findOne({ regNo: regNo });
+        if (!student) return next(new AppError("Enter a valid Regno", 404));
 
-  if (!email && !regNo || !password) {
-    return next(new AppError("Please enter email or registration number, and password for login.", 400));
-  }
+        let token = jwt.sign(
+            { role: "student", regNo: regNo, _id: student._id },
+            process.env.JWT_SECRET
+        );
+        var expirationDate = new Date();
+        expirationDate.setDate(expirationDate.getDate() + 30);
 
-  // Find user by email or regNo
-  const user = await User.findOne({
-    $or: [{ email }, { regNo }]
-  });
+        res.cookie("token", "bearer " + token, {
+            expires: expirationDate,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "None",
+        });
 
-  if (!user) {
-    return next(new AppError("User not found.", 404));
-  }
+        return res.status(200).json({
+            status: "success",
+            data: {
+                student: student,
+            },
+        });
+    }
+    //teacher login
+    if (username && password) {
+        const admin = await Admin.findOne({ username: username });
+        if (admin) {
+            const match = await bcryptjs.compare(password, teacher.password);
+            if (!match)
+                return next(
+                    new AppError("Please enter a correct password", 400)
+                );
 
-  const match = await bcryptjs.compare(password, user.password);
+            let token = jwt.sign(
+                { role: "admin", _id: admin._id },
+                process.env.JWT_SECRET
+            );
+            var expirationDate = new Date();
+            expirationDate.setDate(expirationDate.getDate() + 30);
 
-  if (!match) {
-    return next(new AppError("Incorrect email/registration number or password.", 400));
-  }
+            res.cookie("token", "bearer " + token, {
+                expires: expirationDate,
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "None",
+            });
+            return res.status(200).json({
+                status: "success",
+                data: {
+                    admin: admin,
+                },
+            });
+        }
 
-  user.password = undefined; // Remove password from user object
-  const token = jwt.sign(
-    { id: user._id, role: user.role, email: user.email },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: process.env.LOGIN_EXPIRES,
-    },
-  );
+        const teacher = await Teacher.findOne({ username: username });
+        if (!teacher) return next(new AppError("Username is not found", 404));
 
-  res.status(200).json({
-    status: "success",
-    token,
-    data: {
-      user,
-    },
-  });
+        const match = await bcryptjs.compare(password, teacher.password);
+        if (!match)
+            return next(new AppError("Please enter a correct password", 400));
+
+        let token = jwt.sign(
+            { role: "teacher", _id: teacher._id },
+            process.env.JWT_SECRET
+        );
+        var expirationDate = new Date();
+        expirationDate.setDate(expirationDate.getDate() + 30);
+
+        res.cookie("token", "bearer " + token, {
+            expires: expirationDate,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "None",
+        });
+        return res.status(200).json({
+            status: "success",
+            data: {
+                teacher: teacher,
+            },
+        });
+    } else {
+        return next(new AppError("Enter valid username and password", 400));
+    }
+
+    // res.status(200).json({
+    //     status: "success",
+    //     message: "Signed up and session cookie set",
+    // });
 });
 
+// exports.signup = catchAsync(async (req, res, next) => {});
+
 exports.signout = catchAsync(async (req, res, next) => {
+    res.clearCookie("token");
 
-  res.clearCookie("token");
-
-  res.status(200).json({
-    status: "success",
-    message: "User successfully signed out.",
-  });
+    res.status(200).json({
+        status: "success",
+        message: "User successfully signed out.",
+    });
 });

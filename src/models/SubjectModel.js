@@ -5,6 +5,10 @@ const subjectSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    description: {
+        type: String,
+        required: true,
+    },
     // day: {
     //     type: String,
     //     enum: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"],
@@ -27,7 +31,7 @@ const subjectSchema = new mongoose.Schema({
     teacherId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Teacher",
-        required: true,
+        // required: true,
     },
     exams: [
         {

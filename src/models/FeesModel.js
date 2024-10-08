@@ -31,7 +31,7 @@ const FeesSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    dueDate: {
+    date: {
         type: Date,
         required: true,
     },

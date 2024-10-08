@@ -17,7 +17,7 @@ const attendanceSchema = new mongoose.Schema({
                 ref: "Student",
                 required: true,
             },
-            atendance: {
+            attendance: {
                 type: Boolean,
                 default: true,
             },

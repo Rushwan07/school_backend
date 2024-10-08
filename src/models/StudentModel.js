@@ -36,43 +36,20 @@ const studentSchema = new mongoose.Schema({
         ref: "Class",
         required: true,
     },
-    // gradeId: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "Grade",
-    //     required: true,
-    // },
-    // attendances: [
-    //     {
-    //         type: mongoose.Schema.Types.ObjectId,
-    //         ref: "Attendance",
-    //     },
-    // ],
+
     absentDays: [
         {
             type: Date,
         },
     ],
-    // results: [
-    //     {
-    //         type: mongoose.Schema.Types.ObjectId,
-    //         ref: "Result",
-    //     },
-    // ],
+
     birthday: {
         type: Date,
         required: true,
     },
     transportations: {
-        pickupLocation: {
-            type: String,
-        },
-        dropOffLocation: {
-            type: String,
-        },
-        busNumber: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Transportation",
-        },
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "StudentTransport",
     },
 });
 

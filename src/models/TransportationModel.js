@@ -16,7 +16,7 @@ const transportSchema = new mongoose.Schema({
                 required: true,
             },
             time: {
-                type: Date,
+                type: String,
                 required: true,
             },
             transportationFees: {

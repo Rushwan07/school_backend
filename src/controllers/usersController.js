@@ -15,27 +15,41 @@ exports.signin = catchAsync(async (req, res, next) => {
     const { regNo, username, password } = req.body;
     //student login
     if (regNo) {
-        const student = await Student.findOne({ regNo: regNo });
+        const student = await Student.findOne({ regno: regNo });
         if (!student) return next(new AppError("Enter a valid Regno", 404));
 
         let token = jwt.sign(
-            { role: "student", regNo: regNo, _id: student._id },
+            {
+                role: "student",
+                regNo: regNo,
+                _id: student._id,
+                classId: student.classId,
+            },
             process.env.JWT_SECRET
         );
         var expirationDate = new Date();
         expirationDate.setDate(expirationDate.getDate() + 30);
 
+        // res.cookie("token", "bearer " + token, {
+        //     expires: expirationDate,
+        //     httpOnly: true,
+        //     secure: process.env.NODE_ENV === "production",
+        //     sameSite: "None",
+        // });
         res.cookie("token", "bearer " + token, {
             expires: expirationDate,
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "None",
+            secure: false, // Disable secure cookie for local dev
+            sameSite: "Lax", // This is okay, but "Lax" might work better if you're testing on localhost.
         });
 
         return res.status(200).json({
             status: "success",
             data: {
-                student: student,
+                student: {
+                    ...student.toObject(),
+                    role: "student",
+                },
             },
         });
     }
@@ -43,6 +57,7 @@ exports.signin = catchAsync(async (req, res, next) => {
     if (username && password) {
         const admin = await Admin.findOne({ username: username });
         if (admin) {
+            console.log(admin);
             const match = bcryptjs.compare(password, admin.password);
             if (!match)
                 return next(
@@ -56,17 +71,28 @@ exports.signin = catchAsync(async (req, res, next) => {
             var expirationDate = new Date();
             expirationDate.setDate(expirationDate.getDate() + 30);
 
+            // res.cookie("token", "bearer " + token, {
+            //     expires: expirationDate,
+            //     httpOnly: true,
+            //     secure: process.env.NODE_ENV === "production",
+            //     sameSite: "None",
+            // });
             res.cookie("token", "bearer " + token, {
                 expires: expirationDate,
                 httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-                sameSite: "None",
+                secure: false, // Disable secure cookie for local dev
+                sameSite: "Lax", // This is okay, but "Lax" might work better if you're testing on localhost.
             });
+
             admin.password = null;
+
             return res.status(200).json({
                 status: "success",
                 data: {
-                    admin: admin,
+                    admin: {
+                        ...admin.toObject(),
+                        role: "admin",
+                    },
                 },
             });
         }
@@ -86,17 +112,29 @@ exports.signin = catchAsync(async (req, res, next) => {
         var expirationDate = new Date();
         expirationDate.setDate(expirationDate.getDate() + 30);
 
+        // res.cookie("token", "bearer " + token, {
+        //     expires: expirationDate,
+        //     httpOnly: true,
+        //     secure: process.env.NODE_ENV === "production",
+        //     sameSite: "None",
+        // });
+
         res.cookie("token", "bearer " + token, {
             expires: expirationDate,
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "None",
+            secure: false, // Disable secure cookie for local dev
+            sameSite: "Lax", // This is okay, but "Lax" might work better if you're testing on localhost.
         });
+
         teacher.password = null;
+
         return res.status(200).json({
             status: "success",
             data: {
-                teacher: teacher,
+                teacher: {
+                    ...teacher.toObject(),
+                    role: "teacher",
+                },
             },
         });
     } else {

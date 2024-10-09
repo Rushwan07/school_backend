@@ -9,20 +9,19 @@ const catchAsync = require("../utils/catchAsync");
 //     "classId":"6704ec91fee39a5e6ebd0162"
 
 // }
-exports.createAnnouncement = catchAsync(async (req, res, next) => {
-    const { title, description, date, classId } = req.body;
 
-    if (!title || !description || !date) {
+exports.createAnnouncement = catchAsync(async (req, res, next) => {
+    const { title, description, classId } = req.body;
+
+    if (!title || !description) {
         return next(
-            new AppError(
-                "Title, description, and date are required fields",
-                400
-            )
+            new AppError("Title and description are required fields", 400)
         );
     }
 
     let classExists = null;
-    if (classId) {
+
+    if (classId?.trim()) {
         classExists = await Class.findById(classId);
         if (!classExists) {
             return next(new AppError("Class not found", 404));
@@ -32,14 +31,59 @@ exports.createAnnouncement = catchAsync(async (req, res, next) => {
     const newAnnouncement = await Announcement.create({
         title,
         description,
-        date,
         classId: classExists ? classId : null,
     });
+
+    if (classExists) {
+        await Class.findByIdAndUpdate(classId, {
+            $push: { announcementId: newAnnouncement._id },
+        });
+    }
 
     res.status(201).json({
         status: "success",
         data: {
             announcement: newAnnouncement,
+        },
+    });
+});
+exports.getAnouncementsForAdmin = catchAsync(async (req, res, next) => {
+    const announcement = await Announcement.find();
+
+    res.status(201).json({
+        status: "success",
+        data: {
+            announcement,
+        },
+    });
+});
+
+exports.getAnouncementsForStaff = catchAsync(async (req, res, next) => {
+    const teacherClassIds = req.user.classIds;
+
+    const announcements = await Announcement.find({
+        $or: [{ classId: { $in: teacherClassIds } }, { classId: null }],
+    });
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            announcements,
+        },
+    });
+});
+
+exports.getAnouncementsForStudents = catchAsync(async (req, res, next) => {
+    const studentClassId = req.user.classId;
+
+    const announcements = await Announcement.find({
+        $or: [{ classId: studentClassId }, { classId: null }],
+    });
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            announcements,
         },
     });
 });

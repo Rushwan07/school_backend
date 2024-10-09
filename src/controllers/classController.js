@@ -58,3 +58,30 @@ exports.createClass = catchAsync(async (req, res, next) => {
         },
     });
 });
+
+exports.getClass = catchAsync(async (req, res, next) => {
+    const classes = await Class.find();
+    res.status(200).json({
+        status: "success",
+        data: {
+            class: classes,
+        },
+    });
+});
+
+exports.getStaffClasses = catchAsync(async (req, res, next) => {
+    const teacherId = req.user._id;
+    if (!teacherId) {
+        return next(
+            new AppError("Only signined in staffs can acces this", 400)
+        );
+    }
+
+    const classes = await Class.find({ teacherId });
+    res.status(200).json({
+        status: "success",
+        data: {
+            class: classes,
+        },
+    });
+});

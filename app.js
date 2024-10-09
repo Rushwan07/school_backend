@@ -22,16 +22,14 @@ const gradeRouter = require("./src/routes/gradeRouter");
 const resultsRouter = require("./src/routes/resultRouter");
 
 const app = express();
-
+app.use(cookieParser());
+app.use(express.json());
 app.use(
     cors({
         origin: "http://localhost:5173", // Your frontend's URL
         credentials: true, // Allow credentials (cookies)
     })
 );
-app.use(cookieParser());
-
-app.use(express.json());
 
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/teachers", teacherRouter);

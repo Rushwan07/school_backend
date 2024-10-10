@@ -49,7 +49,7 @@ exports.createEvent = catchAsync(async (req, res, next) => {
     const event = await Event.create({
         name: eventName,
         description,
-        classId,
+        classId: classId.trim() ? classId : null,
         dates,
         startTime,
         endTime,
@@ -63,9 +63,92 @@ exports.createEvent = catchAsync(async (req, res, next) => {
     });
 });
 
-exports.deleteEvent = catchAsync(async (req, res, next) => {});
-exports.getEventForTeacher = catchAsync(async (req, res, next) => {});
-exports.editEvent = catchAsync(async (req, res, next) => {});
+exports.deleteEvent = catchAsync(async (req, res, next) => {
+    const { eventId } = req.params;
+    console.log(eventId);
+    await Event.findByIdAndDelete(eventId);
+    res.status(200).json({
+        status: "success",
+        message: "Event deleted",
+    });
+});
 
-exports.getEventForAdmin = catchAsync(async (req, res, next) => {});
-exports.getEventForStudent = catchAsync(async (req, res, next) => {});
+exports.editEvent = catchAsync(async (req, res, next) => {
+    const { eventName, description, classId, date, startTime, endTime } =
+        req.body;
+    const { eventId } = req.params;
+    let { startDate, dueDate } = date;
+
+    if (!eventName || !description) {
+        return next(new AppError("name, description  are required", 400));
+    }
+
+    if (!startDate) {
+        return next(new AppError("Date is required", 400));
+    }
+
+    let dates;
+    if (startDate === dueDate) {
+        dates = [new Date(startDate)];
+    } else {
+        dates = getDatesInRange(startDate, dueDate);
+    }
+
+    const event = await Event.findByIdAndUpdate(
+        eventId,
+        {
+            name: eventName,
+            description,
+            classId,
+            dates,
+            startTime,
+            endTime,
+        },
+        { new: true }
+    );
+
+    res.status(201).json({
+        status: "success",
+        data: {
+            event,
+        },
+    });
+});
+exports.getEventForTeacher = catchAsync(async (req, res, next) => {
+    const classIds = req.user.classId;
+
+    const events = await Event.find({
+        $or: [{ classId: { $in: classIds } }, { classId: null }],
+    });
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            events,
+        },
+    });
+});
+
+exports.getEventForAdmin = catchAsync(async (req, res, next) => {
+    const events = await Event.find();
+    res.status(200).json({
+        status: "success",
+        data: {
+            events,
+        },
+    });
+});
+exports.getEventForStudent = catchAsync(async (req, res, next) => {
+    const classIds = req.user.classId;
+
+    const events = await Event.find({
+        $or: [{ classId: { $in: classIds } }, { classId: null }],
+    });
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            events,
+        },
+    });
+});

@@ -165,3 +165,13 @@ exports.editTeacher = catchAsync(async (req, res, next) => {
         },
     });
 });
+
+exports.getAllTeachers = catchAsync(async (req, res, next) => {
+    const teachers = await Teacher.find();
+    res.status(200).json({
+        status: "success",
+        data: {
+            teacher,
+        },
+    });
+});

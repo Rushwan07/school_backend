@@ -285,3 +285,13 @@ exports.getAllStudentsGroupedByClass = catchAsync(async (req, res, next) => {
         },
     });
 });
+
+exports.getAllStudents = catchAsync(async (req, res, next) => {
+    const students = await Student.find();
+    res.status(200).json({
+        status: "success",
+        data: {
+            students,
+        },
+    });
+});

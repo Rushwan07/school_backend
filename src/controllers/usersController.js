@@ -77,11 +77,17 @@ exports.signin = catchAsync(async (req, res, next) => {
             //     secure: process.env.NODE_ENV === "production",
             //     sameSite: "None",
             // });
+                      // res.cookie("token", "bearer " + token, {
+            //     expires: expirationDate,
+            //     httpOnly: true,
+            //     secure: false, // Disable secure cookie for local dev
+            //     sameSite: "Lax", // This is okay, but "Lax" might work better if you're testing on localhost.
+            // });
             res.cookie("token", "bearer " + token, {
-                expires: expirationDate,
                 httpOnly: true,
-                secure: false, // Disable secure cookie for local dev
-                sameSite: "Lax", // This is okay, but "Lax" might work better if you're testing on localhost.
+                secure: true, // Set this to true for production when using HTTPS
+                sameSite: "none", // To allow cross-site requests
+                maxAge: 24 * 60 * 60 * 1000, // 1 day
             });
 
             admin.password = null;

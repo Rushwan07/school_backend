@@ -100,7 +100,6 @@ exports.createStudent = catchAsync(async (req, res, next) => {
         transportations: transportId ? transportId : null,
     });
 
-    // Update the studentId in the StudentTransport document if transport was saved
     if (transportId) {
         await StudentTransport.findByIdAndUpdate(transportId, {
             studentId: newStudent._id,
@@ -114,6 +113,144 @@ exports.createStudent = catchAsync(async (req, res, next) => {
         status: "success",
         data: {
             student: newStudent,
+        },
+    });
+});
+exports.getStudent = catchAsync(async (req, res, next) => {
+    const { studentId } = req.params;
+
+    const student = await Student.findById(studentId)
+        .populate("parentId", "name phone email address")
+        .populate("classId", "name capacity")
+        .populate("transportations");
+
+    if (!student) {
+        return next(new AppError("Student not found", 404));
+    }
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            student,
+        },
+    });
+});
+
+exports.editStudent = catchAsync(async (req, res, next) => {
+    const { studentId } = req.params;
+    const { student, parent, transport } = req.body;
+
+    // Find the student
+    const existingStudent = await Student.findById(studentId);
+    if (!existingStudent) {
+        return next(new AppError("Student not found", 404));
+    }
+
+    // Update student details
+    if (student) {
+        if (student.regno && student.regno !== existingStudent.regno) {
+            const existingRegno = await Student.findOne({
+                regno: student.regno,
+            });
+            if (existingRegno) {
+                return next(
+                    new AppError("Registration number already exists", 400)
+                );
+            }
+            existingStudent.regno = student.regno;
+        }
+        if (student.name) existingStudent.name = student.name;
+        if (student.address) existingStudent.address = student.address;
+        if (student.img) existingStudent.img = student.img;
+        if (student.bloodType) existingStudent.bloodType = student.bloodType;
+        if (student.sex && ["MALE", "FEMALE"].includes(student.sex)) {
+            existingStudent.sex = student.sex;
+        }
+        if (student.birthday) existingStudent.birthday = student.birthday;
+        if (
+            student.classId &&
+            student.classId !== existingStudent.classId.toString()
+        ) {
+            // If the class is changed, update the class
+            const oldClass = await Class.findById(existingStudent.classId);
+            oldClass.studentsId.pull(existingStudent._id);
+            await oldClass.save();
+
+            const newClass = await Class.findById(student.classId);
+            newClass.studentsId.push(existingStudent._id);
+            await newClass.save();
+
+            existingStudent.classId = student.classId;
+        }
+    }
+
+    // Update parent details
+    if (parent) {
+        let parentId = existingStudent.parentId;
+        let existingParent = await Parent.findById(parentId);
+
+        if (existingParent) {
+            if (parent.name) existingParent.name = parent.name;
+            if (parent.phone) existingParent.phone = parent.phone;
+            if (parent.email && parent.email !== existingParent.email) {
+                const emailExists = await Parent.findOne({
+                    email: parent.email,
+                });
+                if (emailExists) {
+                    return next(
+                        new AppError("Parent email already exists", 400)
+                    );
+                }
+                existingParent.email = parent.email;
+            }
+            if (parent.address) existingParent.address = parent.address;
+            await existingParent.save();
+        } else {
+            // Create new parent if not found
+            const newParent = await Parent.create({
+                name: parent.name,
+                email: parent.email,
+                phone: parent.phone,
+                address: parent.address,
+            });
+            existingStudent.parentId = newParent._id;
+        }
+    }
+
+    // Update transport details
+    if (transport) {
+        let transportId = existingStudent.transportations;
+        let existingTransport = await StudentTransport.findById(transportId);
+
+        if (existingTransport) {
+            if (transport.pickupLocation)
+                existingTransport.pickupLocation = transport.pickupLocation;
+            if (transport.dropOffLocation)
+                existingTransport.dropOffLocation = transport.dropOffLocation;
+            if (transport.busId) existingTransport.busId = transport.busId;
+            if (transport.fees) existingTransport.fees = transport.fees;
+            await existingTransport.save();
+        } else {
+            // Create new transport if not found
+            const newTransport = await StudentTransport.create({
+                studentId: existingStudent._id,
+                regNo: existingStudent.regno,
+                pickupLocation: transport.pickupLocation,
+                dropOffLocation: transport.dropOffLocation,
+                busId: transport.busId,
+                fees: transport.fees,
+            });
+            existingStudent.transportations = newTransport._id;
+        }
+    }
+
+    // Save the updated student details
+    await existingStudent.save();
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            student: existingStudent,
         },
     });
 });

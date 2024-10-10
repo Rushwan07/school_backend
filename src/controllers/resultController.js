@@ -72,3 +72,26 @@ exports.createResult = catchAsync(async (req, res, next) => {
         },
     });
 });
+
+const getResultsGroupedByExam = catchAsync(async (req, res, next) => {
+    const results = await Result.aggregate([
+        {
+            $group: {
+                _id: "$examId",
+                results: { $push: "$$ROOT" },
+
+                count: { $sum: 1 },
+            },
+        },
+        {
+            $sort: { "results.createdAt": -1 },
+        },
+    ]);
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            results,
+        },
+    });
+});

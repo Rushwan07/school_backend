@@ -4,6 +4,11 @@ const express = require("express");
 
 const router = express.Router();
 
-router.route("/create-student").post(studentController.createStudent);
+router.route("/").post(studentController.createStudent);
+
+router
+    .route("/:studentId")
+    .get(studentController.getStudent)
+    .put(studentController.editStudent);
 
 module.exports = router;

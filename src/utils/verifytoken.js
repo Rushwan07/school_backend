@@ -6,8 +6,6 @@ const Teacher = require("../models/TeacherModel");
 const Student = require("../models/StudentModel");
 
 exports.verifyToken = catchAsync(async (req, res, next) => {
-    console.log("Cookies: ", req.cookies);
-
     const testToken = req.cookies.token;
 
     if (!testToken || !testToken.startsWith("bearer")) {
@@ -21,6 +19,7 @@ exports.verifyToken = catchAsync(async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
+    console.log(decoded);
 
     next();
 });

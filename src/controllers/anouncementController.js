@@ -47,6 +47,60 @@ exports.createAnnouncement = catchAsync(async (req, res, next) => {
         },
     });
 });
+
+exports.editAnnouncement = catchAsync(async (req, res, next) => {
+    const { anouncementId } = req.params;
+
+    if (!anouncementId) {
+        return next(new AppError("Anouncement are required fields", 400));
+    }
+
+    const { title, description, classId } = req.body;
+
+    if (classId?.trim()) {
+        classExists = await Class.findById(classId);
+        if (!classExists) {
+            return next(new AppError("Class not found", 404));
+        }
+    }
+
+    if (!title || !description) {
+        return next(
+            new AppError("Title and description are required fields", 400)
+        );
+    }
+
+    const newAnnouncement = await Announcement.findByIdAndUpdate(
+        anouncementId,
+        {
+            title,
+            description,
+            classId: classExists ? classId : null,
+        },
+        { new: true }
+    );
+    res.status(201).json({
+        status: "success",
+        data: {
+            announcement: newAnnouncement,
+        },
+    });
+});
+
+exports.deleteAnouncement = catchAsync(async (req, res, next) => {
+    const { anouncementId } = req.params;
+
+    if (!anouncementId) {
+        return next(new AppError("Anouncement are required fields", 400));
+    }
+
+    await Announcement.findByIdAndDelete(anouncementId);
+    return res.status(200).json({
+        status: "success",
+        message: "Deleted successfully",
+    });
+});
+
 exports.getAnouncementsForAdmin = catchAsync(async (req, res, next) => {
     const announcement = await Announcement.find();
 
@@ -59,7 +113,7 @@ exports.getAnouncementsForAdmin = catchAsync(async (req, res, next) => {
 });
 
 exports.getAnouncementsForStaff = catchAsync(async (req, res, next) => {
-    const teacherClassIds = req.user.classIds;
+    const teacherClassIds = req.user.classId;
 
     const announcements = await Announcement.find({
         $or: [{ classId: { $in: teacherClassIds } }, { classId: null }],

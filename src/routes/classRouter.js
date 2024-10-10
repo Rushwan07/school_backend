@@ -1,11 +1,17 @@
 const classController = require("../controllers/classController");
+const { verifyToken } = require("../utils/verifytoken");
 
 const express = require("express");
 
 const router = express.Router();
 
-router.route("/create-class").post(classController.createClass);
-router.route("/").get(classController.getClass);
-router.route("/staff-class").get(classController.getStaffClasses);
+router
+    .route("/")
+    .post(classController.createClass)
+    .get(classController.getClass);
+
+router.route("/:classId").put(classController.editClass);
+
+router.route("/staff-class").get(verifyToken, classController.getStaffClasses);
 
 module.exports = router;

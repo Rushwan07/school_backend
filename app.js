@@ -24,9 +24,14 @@ const resultsRouter = require("./src/routes/resultRouter");
 const app = express();
 app.use(cookieParser());
 app.use(express.json());
+
+const allowedOrigins = [
+    "http://localhost:5173", // Your frontend development URL
+    "https://streamlinechildcare-frontend.netlify.app", // Your production URL
+];
 app.use(
     cors({
-        origin: "http://localhost:5173", // Your frontend's URL
+        origin: allowedOrigins, // Your frontend's URL
         credentials: true, // Allow credentials (cookies)
     })
 );

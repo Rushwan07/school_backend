@@ -26,8 +26,8 @@ app.use(cookieParser());
 app.use(express.json());
 
 const allowedOrigins = [
-    "http://localhost:5173", // Your frontend development URL
     "https://streamlinechildcare-frontend.netlify.app", // Your production URL
+    "http://localhost:5173", // Your frontend development URL
 ];
 app.use(
     cors({

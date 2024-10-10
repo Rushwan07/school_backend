@@ -96,7 +96,7 @@ exports.signin = catchAsync(async (req, res, next) => {
             return next(new AppError("Please enter a correct password", 400));
 
         let token = jwt.sign(
-            { role: "teacher", _id: teacher._id, classId: teacher.classes },
+            { role: "teacher", _id: teacher._id },
             process.env.JWT_SECRET
         );
         var expirationDate = new Date();

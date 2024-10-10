@@ -4,6 +4,7 @@ const express = require("express");
 
 const router = express.Router();
 
-router.route("/create-result").post(resultController.createResult);
+router.route("/").post(resultController.createResult);
+// router.route("/admin-results").get("resultController.getAdmin   ")
 
 module.exports = router;

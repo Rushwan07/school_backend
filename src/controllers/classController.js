@@ -86,7 +86,7 @@ exports.getStaffClasses = catchAsync(async (req, res, next) => {
         );
     }
 
-    const classes = await Class.find({ teacherId });
+    const classes = await Class.find({ teacherId }).populate("studentsId");
     res.status(200).json({
         status: "success",
         data: {
@@ -107,7 +107,7 @@ exports.editClass = catchAsync(async (req, res, next) => {
         baseFees,
     } = req.body;
 
-    const classToUpdate = await Class.findById(req.params.id);
+    const classToUpdate = await Class.findById(req.params.classId);
     if (!classToUpdate) {
         return next(new AppError("Class not found", 404));
     }

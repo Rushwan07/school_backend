@@ -62,3 +62,10 @@ exports.createEvent = catchAsync(async (req, res, next) => {
         },
     });
 });
+
+exports.deleteEvent = catchAsync(async (req, res, next) => {});
+exports.getEventForTeacher = catchAsync(async (req, res, next) => {});
+exports.editEvent = catchAsync(async (req, res, next) => {});
+
+exports.getEventForAdmin = catchAsync(async (req, res, next) => {});
+exports.getEventForStudent = catchAsync(async (req, res, next) => {});

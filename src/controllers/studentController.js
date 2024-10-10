@@ -1,5 +1,6 @@
 const Student = require("../models/StudentModel");
 const Parent = require("../models/ParentModel");
+const Class = require("../models/ClassModel");
 const StudentTransport = require("../models/StudentTransportModel");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
@@ -105,6 +106,9 @@ exports.createStudent = catchAsync(async (req, res, next) => {
             studentId: newStudent._id,
         });
     }
+    const studentClass = await Class.findById(student?.classId);
+    studentClass.studentsId.push(newStudent._id);
+    await studentClass.save();
 
     res.status(201).json({
         status: "success",

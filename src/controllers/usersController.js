@@ -36,12 +36,7 @@ exports.signin = catchAsync(async (req, res, next) => {
         //     secure: process.env.NODE_ENV === "production",
         //     sameSite: "None",
         // });
-        res.cookie("token", "bearer " + token, {
-            expires: expirationDate,
-            httpOnly: true,
-            secure: false, // Disable secure cookie for local dev
-            sameSite: "Lax", // This is okay, but "Lax" might work better if you're testing on localhost.
-        });
+        res.cookie("token", "bearer " + token);
 
         return res.status(200).json({
             status: "success",
@@ -77,12 +72,7 @@ exports.signin = catchAsync(async (req, res, next) => {
             //     secure: process.env.NODE_ENV === "production",
             //     sameSite: "None",
             // });
-            res.cookie("token", "bearer " + token, {
-                expires: expirationDate,
-                httpOnly: true,
-                secure: false, // Disable secure cookie for local dev
-                sameSite: "Lax", // This is okay, but "Lax" might work better if you're testing on localhost.
-            });
+            res.cookie("token", "bearer " + token);
 
             admin.password = null;
 
@@ -119,12 +109,7 @@ exports.signin = catchAsync(async (req, res, next) => {
         //     sameSite: "None",
         // });
 
-        res.cookie("token", "bearer " + token, {
-            expires: expirationDate,
-            httpOnly: true,
-            secure: false, // Disable secure cookie for local dev
-            sameSite: "Lax", // This is okay, but "Lax" might work better if you're testing on localhost.
-        });
+        res.cookie("token", "bearer " + token);
 
         teacher.password = null;
 

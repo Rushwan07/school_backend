@@ -39,8 +39,8 @@ exports.signin = catchAsync(async (req, res, next) => {
         res.cookie("token", "bearer " + token, {
             expires: expirationDate,
             httpOnly: true,
-            secure: false, // Disable secure cookie for local dev
-            sameSite: "Lax", // This is okay, but "Lax" might work better if you're testing on localhost.
+            secure: true, // Disable secure cookie for local dev
+            sameSite: "None", // This is okay, but "Lax" might work better if you're testing on localhost.
         });
 
         return res.status(200).json({

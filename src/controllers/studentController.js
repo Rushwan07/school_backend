@@ -184,7 +184,6 @@ exports.editStudent = catchAsync(async (req, res, next) => {
         }
     }
 
-    // Update parent details
     if (parent) {
         let parentId = existingStudent.parentId;
         let existingParent = await Parent.findById(parentId);
@@ -206,7 +205,6 @@ exports.editStudent = catchAsync(async (req, res, next) => {
             if (parent.address) existingParent.address = parent.address;
             await existingParent.save();
         } else {
-            // Create new parent if not found
             const newParent = await Parent.create({
                 name: parent.name,
                 email: parent.email,
@@ -217,7 +215,6 @@ exports.editStudent = catchAsync(async (req, res, next) => {
         }
     }
 
-    // Update transport details
     if (transport) {
         let transportId = existingStudent.transportations;
         let existingTransport = await StudentTransport.findById(transportId);
@@ -231,7 +228,6 @@ exports.editStudent = catchAsync(async (req, res, next) => {
             if (transport.fees) existingTransport.fees = transport.fees;
             await existingTransport.save();
         } else {
-            // Create new transport if not found
             const newTransport = await StudentTransport.create({
                 studentId: existingStudent._id,
                 regNo: existingStudent.regno,
@@ -244,13 +240,48 @@ exports.editStudent = catchAsync(async (req, res, next) => {
         }
     }
 
-    // Save the updated student details
     await existingStudent.save();
 
     res.status(200).json({
         status: "success",
         data: {
             student: existingStudent,
+        },
+    });
+});
+
+exports.getAllStudentsGroupedByClass = catchAsync(async (req, res, next) => {
+    const students = await Class.find().populate("studentsId");
+    // const students = await Student.aggregate([
+    //     {
+    //         $group: {
+    //             _id: "$classId", // Group by classId
+    //             students: { $push: "$$ROOT" }, // Push all the student details into an array
+    //         },
+    //     },
+    //     {
+    //         $lookup: {
+    //             from: "classes", // Lookup the Class collection
+    //             localField: "_id", // classId in Student
+    //             foreignField: "_id", // _id in Class
+    //             as: "classDetails", // Output as classDetails
+    //         },
+    //     },
+    //     {
+    //         $unwind: {
+    //             path: "$classDetails",
+    //             preserveNullAndEmptyArrays: true, // Keep results even if the classId doesn't match a class
+    //         },
+    //     },
+    //     {
+    //         $sort: { "classDetails.name": 1 }, // Sort by class name (optional)
+    //     },
+    // ]);
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            groupedStudents: students,
         },
     });
 });

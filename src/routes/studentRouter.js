@@ -5,6 +5,9 @@ const express = require("express");
 const router = express.Router();
 
 router.route("/").post(studentController.createStudent);
+router
+    .route("/student-class")
+    .get(studentController.getAllStudentsGroupedByClass);
 
 router
     .route("/:studentId")

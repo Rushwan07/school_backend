@@ -93,3 +93,75 @@ exports.createTeacher = catchAsync(async (req, res, next) => {
         },
     });
 });
+exports.editTeacher = catchAsync(async (req, res, next) => {
+    const { teacherId } = req.params; // Get the teacherId from the request params
+    const {
+        username,
+        password,
+        name,
+        email,
+        phone,
+        address,
+        img,
+        bloodType,
+        sex,
+        subjects,
+        classes,
+        birthday,
+    } = req.body;
+
+    // Find the teacher by ID
+    const teacher = await Teacher.findById(teacherId);
+
+    if (!teacher) {
+        return next(new AppError("Teacher not found", 404));
+    }
+
+    // Check for existing username, email, or phone if provided
+    if (username && username !== teacher.username) {
+        const existingUsername = await Teacher.findOne({ username });
+        if (existingUsername) {
+            return next(new AppError("Username already exists", 400));
+        }
+        teacher.username = username;
+    }
+
+    if (email && email !== teacher.email) {
+        const existingEmail = await Teacher.findOne({ email });
+        if (existingEmail) {
+            return next(new AppError("Email already exists", 400));
+        }
+        teacher.email = email;
+    }
+
+    if (phone && phone !== teacher.phone) {
+        const existingPhone = await Teacher.findOne({ phone });
+        if (existingPhone) {
+            return next(new AppError("Phone number already exists", 400));
+        }
+        teacher.phone = phone;
+    }
+
+    // Update other fields if they are provided
+    if (password && password.length >= 4) {
+        teacher.password = password;
+    }
+    if (name) teacher.name = name;
+    if (address) teacher.address = address;
+    if (img) teacher.img = img;
+    if (bloodType) teacher.bloodType = bloodType;
+    if (sex && ["MALE", "FEMALE"].includes(sex)) teacher.sex = sex;
+    if (subjects) teacher.subjects = subjects;
+    if (classes) teacher.classes = classes;
+    if (birthday) teacher.birthday = birthday;
+
+    // Save the updated teacher
+    await teacher.save();
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            teacher,
+        },
+    });
+});

@@ -36,17 +36,25 @@ exports.signin = catchAsync(async (req, res, next) => {
         //     secure: process.env.NODE_ENV === "production",
         //     sameSite: "None",
         // });
-        res.cookie("token", "bearer " + token);
+        // res.cookie("token", "bearer " + token, {
+        //     expires: expirationDate,
+        //     httpOnly: true,
+        //     secure: false, // Disable secure cookie for local dev
+        //     sameSite: "Lax", // This is okay, but "Lax" might work better if you're testing on localhost.
+        // });
 
-        return res.status(200).json({
-            status: "success",
-            data: {
-                student: {
-                    ...student.toObject(),
-                    role: "student",
+        return res
+            .cookie("token", "bearer " + token, { httpOnly: true })
+            .status(200)
+            .json({
+                status: "success",
+                data: {
+                    student: {
+                        ...student.toObject(),
+                        role: "student",
+                    },
                 },
-            },
-        });
+            });
     }
     //teacher login
     if (username && password) {
@@ -72,19 +80,27 @@ exports.signin = catchAsync(async (req, res, next) => {
             //     secure: process.env.NODE_ENV === "production",
             //     sameSite: "None",
             // });
-            res.cookie("token", "bearer " + token);
+            // res.cookie("token", "bearer " + token, {
+            //     expires: expirationDate,
+            //     httpOnly: true,
+            //     secure: false, // Disable secure cookie for local dev
+            //     sameSite: "Lax", // This is okay, but "Lax" might work better if you're testing on localhost.
+            // });
 
             admin.password = null;
 
-            return res.status(200).json({
-                status: "success",
-                data: {
-                    admin: {
-                        ...admin.toObject(),
-                        role: "admin",
+            return res
+                .cookie("token", "bearer " + token, { httpOnly: true })
+                .status(200)
+                .json({
+                    status: "success",
+                    data: {
+                        admin: {
+                            ...admin.toObject(),
+                            role: "admin",
+                        },
                     },
-                },
-            });
+                });
         }
 
         const teacher = await Teacher.findOne({ username: username });
@@ -96,7 +112,7 @@ exports.signin = catchAsync(async (req, res, next) => {
             return next(new AppError("Please enter a correct password", 400));
 
         let token = jwt.sign(
-            { role: "teacher", _id: teacher._id },
+            { role: "teacher", _id: teacher._id, classId: teacher.classes },
             process.env.JWT_SECRET
         );
         var expirationDate = new Date();
@@ -109,19 +125,27 @@ exports.signin = catchAsync(async (req, res, next) => {
         //     sameSite: "None",
         // });
 
-        res.cookie("token", "bearer " + token);
+        // res.cookie("token", "bearer " + token, {
+        //     expires: expirationDate,
+        //     httpOnly: true,
+        //     secure: false, // Disable secure cookie for local dev
+        //     sameSite: "Lax", // This is okay, but "Lax" might work better if you're testing on localhost.
+        // });
 
         teacher.password = null;
 
-        return res.status(200).json({
-            status: "success",
-            data: {
-                teacher: {
-                    ...teacher.toObject(),
-                    role: "teacher",
+        return res
+            .cookie("token", "bearer " + token, { httpOnly: true })
+            .status(200)
+            .json({
+                status: "success",
+                data: {
+                    teacher: {
+                        ...teacher.toObject(),
+                        role: "teacher",
+                    },
                 },
-            },
-        });
+            });
     } else {
         return next(new AppError("Enter valid username and password", 400));
     }

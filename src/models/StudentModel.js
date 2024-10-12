@@ -43,6 +43,11 @@ const studentSchema = new mongoose.Schema({
             type: Date,
         },
     ],
+    presentDays: [
+        {
+            type: Date,
+        },
+    ],
 
     birthday: {
         type: Date,

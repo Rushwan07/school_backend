@@ -22,6 +22,15 @@ exports.createClass = catchAsync(async (req, res, next) => {
         baseFees,
     } = req.body;
 
+    console.log(name,
+        capacity,
+        "teacherId", teacherId,
+        "subjectsId", subjectsId,
+        "studentsId", studentsId,
+        eventId,
+        announcementId,
+        baseFees,)
+
     if (!name || !name.trim()) {
         return next(new AppError("Class name is required", 400));
     }
@@ -69,7 +78,7 @@ exports.createClass = catchAsync(async (req, res, next) => {
 });
 
 exports.getClass = catchAsync(async (req, res, next) => {
-    const classes = await Class.find().populate("subjectsId");
+    const classes = await Class.find().populate("subjectsId studentsId");
     res.status(200).json({
         status: "success",
         data: {

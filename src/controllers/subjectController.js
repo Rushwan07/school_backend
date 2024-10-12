@@ -37,11 +37,11 @@ exports.createSubject = catchAsync(async (req, res, next) => {
 
 
 exports.getall = catchAsync(async (req, res, next) => {
-    const subjects = await Teacher.find();
+    const subjects = await Subject.find();
     res.status(200).json({
         status: "success",
         data: {
-            teacher,
+            subjects,
         },
     });
 });

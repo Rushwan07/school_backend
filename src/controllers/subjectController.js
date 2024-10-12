@@ -35,6 +35,16 @@ exports.createSubject = catchAsync(async (req, res, next) => {
     });
 });
 
+
+exports.getall = catchAsync(async (req, res, next) => {
+    const subjects = await Teacher.find();
+    res.status(200).json({
+        status: "success",
+        data: {
+            teacher,
+        },
+    });
+});
 exports.editSubject = catchAsync(async (req, res, next) => {
     const { subjectId } = req.params;
     const { name, teacherId, exams, lessions, assignments, description } =

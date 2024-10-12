@@ -14,9 +14,12 @@ const catchAsync = require("../utils/catchAsync");
 //     }
 
 exports.createAssignment = catchAsync(async (req, res, next) => {
+    console.log("Done0")
+
     const { title, startDate, dueDate, description, classId, subjectId } =
         req.body;
 
+        console.log("Done")
     if (
         !title ||
         !startDate ||
@@ -32,6 +35,7 @@ exports.createAssignment = catchAsync(async (req, res, next) => {
             )
         );
     }
+    console.log("Done2")
 
     const classExists = await Class.findById(classId);
     if (!classExists) {
@@ -51,6 +55,7 @@ exports.createAssignment = catchAsync(async (req, res, next) => {
         classId,
         subjectId,
     });
+    console.log("Done3")
 
     res.status(201).json({
         status: "success",

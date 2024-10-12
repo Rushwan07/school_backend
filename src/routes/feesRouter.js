@@ -1,9 +1,13 @@
 const feesController = require("../controllers/feesController");
+const { verifyToken } = require("../utils/verifytoken");
 
 const express = require("express");
 
 const router = express.Router();
 
 router.route("/create-fees").post(feesController.createFeeRecord);
+router
+    .route("/student-fees")
+    .get(verifyToken, feesController.getStudentFeesDetails);
 
 module.exports = router;

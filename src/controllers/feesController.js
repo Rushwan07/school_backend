@@ -78,3 +78,15 @@ exports.createFeeRecord = catchAsync(async (req, res, next) => {
         },
     });
 });
+
+exports.getStudentFeesDetails = catchAsync(async (req, res, next) => {
+    const _id = req.user._id;
+    const feesDetails = await Fees.find({ studentId: _id });
+
+    res.status(200).json({
+        status: "status",
+        data: {
+            feesDetails,
+        },
+    });
+});

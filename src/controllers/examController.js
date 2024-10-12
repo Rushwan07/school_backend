@@ -156,9 +156,21 @@ exports.getTeacherExams = catchAsync(async (req, res, next) => {
     });
 });
 exports.getStudentExams = catchAsync(async (req, res, next) => {
-    console.log(req.user);
     const classId = req.user.classId;
-    const exam = await Exam.find({ classId: { $in: classId } });
+    const exam = await Exam.find({ classId: { $in: classId } })
+        .populate("classId")
+        .populate({
+            path: "results",
+            populate: {
+                path: "subjects.subjectId",
+            },
+        })
+        .populate({
+            path: "subjects",
+            populate: {
+                path: "subjectId",
+            },
+        });
 
     res.status(201).json({
         status: "success",

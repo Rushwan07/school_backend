@@ -1,4 +1,5 @@
 const Result = require("../models/ResultModel");
+const Exam = require("../models/ExamModel");
 const Grade = require("../models/GradeModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
@@ -61,6 +62,11 @@ exports.createResult = catchAsync(async (req, res, next) => {
             classId,
             studentId,
         });
+
+        const exam = await Exam.findById(examId);
+
+        exam.results.push(newResult._id);
+        await exam.save();
 
         results.push(newResult);
     }

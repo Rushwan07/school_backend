@@ -17,6 +17,7 @@ const studentSchema = new mongoose.Schema({
     },
     img: {
         type: String,
+        default: "@/assets/emptyProfile.jpeg",
     },
     bloodType: {
         type: String,
@@ -38,6 +39,11 @@ const studentSchema = new mongoose.Schema({
     },
 
     absentDays: [
+        {
+            type: Date,
+        },
+    ],
+    presentDays: [
         {
             type: Date,
         },

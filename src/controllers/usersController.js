@@ -15,7 +15,9 @@ exports.signin = catchAsync(async (req, res, next) => {
     const { regNo, username, password } = req.body;
     //student login
     if (regNo) {
-        const student = await Student.findOne({ regno: regNo });
+        const student = await Student.findOne({ regno: regNo }).populate(
+            "classId parentId transportations"
+        );
         if (!student) return next(new AppError("Enter a valid Regno", 404));
 
         let token = jwt.sign(

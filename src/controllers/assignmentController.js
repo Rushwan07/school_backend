@@ -163,14 +163,14 @@ exports.getAnouncementsForStaff = catchAsync(async (req, res, next) => {
 exports.getAnouncementsForStudents = catchAsync(async (req, res, next) => {
     const studentClassId = req.user.classId;
 
-    const announcements = await Assignment.find({
+    const assignment = await Assignment.find({
         $or: [{ classId: studentClassId }, { classId: null }],
     });
 
     res.status(200).json({
         status: "success",
         data: {
-            announcements,
+            assignment,
         },
     });
 });

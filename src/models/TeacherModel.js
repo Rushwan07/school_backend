@@ -29,6 +29,7 @@ const teacherSchema = new mongoose.Schema({
     },
     img: {
         type: String,
+        default: "@/assets/emptyProfile.jpeg",
     },
     bloodType: {
         type: String,

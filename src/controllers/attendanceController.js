@@ -63,6 +63,7 @@ exports.createAttendance = catchAsync(async (req, res, next) => {
                 studentExists.absentDays.push(date);
                 absentCount++;
             } else {
+                studentExists.presentDays.push(date);
                 presentCount++;
             }
             console.log("studentExists.absentDays", studentExists)

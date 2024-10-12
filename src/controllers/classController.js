@@ -69,7 +69,7 @@ exports.createClass = catchAsync(async (req, res, next) => {
 });
 
 exports.getClass = catchAsync(async (req, res, next) => {
-    const classes = await Class.find();
+    const classes = await Class.find().populate("subjectsId");
     res.status(200).json({
         status: "success",
         data: {

@@ -43,18 +43,21 @@ exports.signin = catchAsync(async (req, res, next) => {
         //     sameSite: "Lax", // This is okay, but "Lax" might work better if you're testing on localhost.
         // });
 
-        return res
-            .cookie("token", "bearer " + token, { httpOnly: true })
-            .status(200)
-            .json({
-                status: "success",
-                data: {
-                    student: {
-                        ...student.toObject(),
-                        role: "student",
+        return (
+            res
+                // .cookie("token", "bearer " + token, { httpOnly: true })
+                .status(200)
+                .json({
+                    status: "success",
+                    data: {
+                        student: {
+                            ...student.toObject(),
+                            role: "student",
+                        },
+                        token: "bearer " + token,
                     },
-                },
-            });
+                })
+        );
     }
     //teacher login
     if (username && password) {
@@ -89,18 +92,21 @@ exports.signin = catchAsync(async (req, res, next) => {
 
             admin.password = null;
 
-            return res
-                .cookie("token", "bearer " + token, { httpOnly: true })
-                .status(200)
-                .json({
-                    status: "success",
-                    data: {
-                        admin: {
-                            ...admin.toObject(),
-                            role: "admin",
+            return (
+                res
+                    // .cookie("token", "bearer " + token, { httpOnly: true })
+                    .status(200)
+                    .json({
+                        status: "success",
+                        data: {
+                            admin: {
+                                ...admin.toObject(),
+                                role: "admin",
+                            },
+                            token: "bearer " + token,
                         },
-                    },
-                });
+                    })
+            );
         }
 
         const teacher = await Teacher.findOne({ username: username });
@@ -134,18 +140,21 @@ exports.signin = catchAsync(async (req, res, next) => {
 
         teacher.password = null;
 
-        return res
-            .cookie("token", "bearer " + token, { httpOnly: true })
-            .status(200)
-            .json({
-                status: "success",
-                data: {
-                    teacher: {
-                        ...teacher.toObject(),
-                        role: "teacher",
+        return (
+            res
+                // .cookie("token", "bearer " + token, { httpOnly: true })
+                .status(200)
+                .json({
+                    status: "success",
+                    data: {
+                        teacher: {
+                            ...teacher.toObject(),
+                            role: "teacher",
+                        },
+                        token: "bearer " + token,
                     },
-                },
-            });
+                })
+        );
     } else {
         return next(new AppError("Enter valid username and password", 400));
     }

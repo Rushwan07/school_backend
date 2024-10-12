@@ -6,8 +6,9 @@ const Teacher = require("../models/TeacherModel");
 const Student = require("../models/StudentModel");
 
 exports.verifyToken = catchAsync(async (req, res, next) => {
-    const testToken = req.cookies.token;
-
+    const testToken = req.headers.token;
+    console.log(req.headers);
+    console.log(req.headers.token);
     if (!testToken || !testToken.startsWith("bearer")) {
         return res.status(400).json({
             status: "failed",

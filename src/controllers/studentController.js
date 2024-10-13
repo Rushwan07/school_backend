@@ -100,6 +100,10 @@ exports.createStudent = catchAsync(async (req, res, next) => {
         transportations: transportId ? transportId : null,
     });
 
+    const newStudent1 = await Student.findById(newStudent?._id).populate(
+        "classId"
+    );
+
     if (transportId) {
         await StudentTransport.findByIdAndUpdate(transportId, {
             studentId: newStudent._id,
@@ -112,7 +116,7 @@ exports.createStudent = catchAsync(async (req, res, next) => {
     res.status(201).json({
         status: "success",
         data: {
-            student: newStudent,
+            student: newStudent1,
         },
     });
 });
@@ -287,7 +291,7 @@ exports.getAllStudentsGroupedByClass = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllStudents = catchAsync(async (req, res, next) => {
-    const students = await Student.find();
+    const students = await Student.find().populate("classId");
     res.status(200).json({
         status: "success",
         data: {

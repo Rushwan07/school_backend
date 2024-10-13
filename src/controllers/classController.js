@@ -1,4 +1,5 @@
 const Class = require("../models/ClassModel");
+const SubjectModel = require("../models/SubjectModel");
 const Teacher = require("../models/TeacherModel");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
@@ -15,21 +16,12 @@ exports.createClass = catchAsync(async (req, res, next) => {
         name,
         capacity,
         teacherId,
-        subjectsId,
         studentsId,
         eventId,
         announcementId,
         baseFees,
+        subjects, // Array of subjects
     } = req.body;
-
-    console.log(name,
-        capacity,
-        "teacherId", teacherId,
-        "subjectsId", subjectsId,
-        "studentsId", studentsId,
-        eventId,
-        announcementId,
-        baseFees,)
 
     if (!name || !name.trim()) {
         return next(new AppError("Class name is required", 400));
@@ -50,11 +42,42 @@ exports.createClass = catchAsync(async (req, res, next) => {
         return next(new AppError("Class name already exists", 400));
     }
 
+    let subjectIds = [];
+    for (const subject of subjects) {
+        const {
+            name: subjectName,
+            teacherId: subjectTeacherId,
+            lessons,
+            description,
+        } = subject;
+
+        if (!name || !name.trim()) {
+            return next(new AppError("Subject name is required", 400));
+        }
+        if (!description) {
+            return next(new AppError("Subject description is required", 400));
+        }
+        if (!lessons || lessons.length === 0) {
+            return next(new AppError("At least one lesson is required", 400));
+        }
+
+        const newSubject = await SubjectModel.create({
+            name,
+            description,
+            teacherId,
+            exams: [],
+            lessions: lessons,
+            assignments: [],
+        });
+
+        subjectIds.push(newSubject._id);
+    }
+
     const newClass = await Class.create({
         name,
         capacity,
         teacherId,
-        subjectsId,
+        subjectsId: subjectIds,
         studentsId,
         eventId,
         announcementId,
@@ -69,16 +92,26 @@ exports.createClass = catchAsync(async (req, res, next) => {
     teacher.classes.push(newClass._id);
     await teacher.save();
 
+    await SubjectModel.updateMany(
+        { _id: { $in: subjectIds } }, // Find all subjects by their IDs
+        { $set: { classId: newClass._id } } // Set classId to the new class's _id
+    );
+    const populatedClass = await Class.findById(newClass._id).populate(
+        "teacherId"
+    );
+
     res.status(201).json({
         status: "success",
         data: {
-            class: newClass,
+            class: populatedClass,
         },
     });
 });
 
 exports.getClass = catchAsync(async (req, res, next) => {
-    const classes = await Class.find().populate("subjectsId studentsId");
+    const classes = await Class.find().populate(
+        "subjectsId studentsId teacherId"
+    );
     res.status(200).json({
         status: "success",
         data: {

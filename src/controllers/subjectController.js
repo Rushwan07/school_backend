@@ -1,6 +1,7 @@
 const Subject = require("../models/SubjectModel");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
+const Class = require("../models/ClassModel");
 // {
 //     "name":"tamil", "lessions":["lession1","lession2"], "description":"descriptin for the subject"
 // }
@@ -35,9 +36,8 @@ exports.createSubject = catchAsync(async (req, res, next) => {
     });
 });
 
-
 exports.getall = catchAsync(async (req, res, next) => {
-    const subjects = await Subject.find();
+    const subjects = await Subject.find().populate("classId teacherId");
     res.status(200).json({
         status: "success",
         data: {
@@ -83,6 +83,21 @@ exports.editSubject = catchAsync(async (req, res, next) => {
         status: "success",
         data: {
             subject,
+        },
+    });
+});
+
+exports.getStudentSubjects = catchAsync(async (req, res, next) => {
+    console.log(req.user.classId);
+    const classs = await Class.findById(req.user.classId);
+    console.log("*********");
+    console.log(classs);
+    console.log("*********");
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            s: "subject",
         },
     });
 });

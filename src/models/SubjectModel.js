@@ -9,25 +9,11 @@ const subjectSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    // day: {
-    //     type: String,
-    //     enum: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"],
-    //     required: true,
-    // },
-    // startTime: {
-    //     type: Date,
-    //     required: true,
-    // },
-    // endTime: {
-    //     type: Date,
-    //     required: true,
-    // },
 
-    // classId: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "Class",
-    //     required: true,
-    // },
+    classId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Class",
+    },
     teacherId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Teacher",

@@ -32,6 +32,7 @@ exports.createTeacher = catchAsync(async (req, res, next) => {
         classes,
         birthday,
     } = req.body;
+    console.log(req.body);
 
     if (!username || !username.trim()) {
         return next(new AppError("Enter a valid username", 400));

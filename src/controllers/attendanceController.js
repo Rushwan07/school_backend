@@ -28,7 +28,11 @@ const catchAsync = require("../utils/catchAsync");
 
 exports.createAttendance = catchAsync(async (req, res, next) => {
     const { classId, students } = req.body;
-    console.log(students)
+    console.log("*******************************");
+    console.log(classId);
+    console.log(students);
+    console.log("*******************************");
+
     const date = new Date();
     const today = date.toISOString().split("T")[0];
     const month = today.substring(0, 7);
@@ -50,14 +54,14 @@ exports.createAttendance = catchAsync(async (req, res, next) => {
     const studentAttendance = await Promise.all(
         students.map(async (student) => {
             const { _id: studentId, present } = student;
-            console.log("studentId", studentId)
+            console.log("studentId", studentId);
             const studentExists = await Student.findById(studentId);
             if (!studentExists) {
                 return next(
                     new AppError(`Student with id ${studentId} not found`, 404)
                 );
             }
-            console.log("Done")
+            console.log("Done");
 
             if (present === "false") {
                 studentExists.absentDays.push(date);
@@ -66,11 +70,9 @@ exports.createAttendance = catchAsync(async (req, res, next) => {
                 studentExists.presentDays.push(date);
                 presentCount++;
             }
-            console.log("studentExists.absentDays", studentExists)
+            console.log("studentExists.absentDays", studentExists);
 
             await studentExists.save();
-            console.log("Done2")
-
 
             return {
                 studentId,
@@ -78,18 +80,13 @@ exports.createAttendance = catchAsync(async (req, res, next) => {
             };
         })
     );
-    console.log("Done3")
-
 
     let attendanceCount = await AttendanceCount.findOne({ date: today });
-    console.log("Done4")
 
     if (attendanceCount) {
         attendanceCount.presentCount += presentCount;
         attendanceCount.absentCount += absentCount;
         attendanceCount.totalStudents += students.length;
-        console.log("Done5")
-
     } else {
         attendanceCount = new AttendanceCount({
             date: today,
@@ -97,22 +94,19 @@ exports.createAttendance = catchAsync(async (req, res, next) => {
             absentCount,
             totalStudents: students.length,
             month,
-
         });
-        console.log("Done6")
-
+        console.log("Done6");
     }
 
     await attendanceCount.save();
-    console.log("Done7")
+    console.log("Done7");
 
     const newAttendance = await Attendance.create({
         classId,
         date,
         students: studentAttendance,
     });
-    console.log("Done8")
-
+    console.log("Done8");
 
     res.status(201).json({
         status: "success",

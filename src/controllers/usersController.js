@@ -25,7 +25,7 @@ exports.signin = catchAsync(async (req, res, next) => {
                 role: "student",
                 regNo: regNo,
                 _id: student._id,
-                classId: student.classId,
+                classId: student.classId._id,
             },
             process.env.JWT_SECRET
         );

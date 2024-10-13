@@ -44,27 +44,26 @@ exports.createClass = catchAsync(async (req, res, next) => {
 
     let subjectIds = [];
     for (const subject of subjects) {
-        const {
-            name: subjectName,
-            teacherId: subjectTeacherId,
-            lessons,
-            description,
-        } = subject;
+        const { subjectName, teacher, lessons, description } = subject;
+        console.log(subject);
 
-        if (!name || !name.trim()) {
+        if (!subjectName || !subjectName.trim()) {
             return next(new AppError("Subject name is required", 400));
         }
         if (!description) {
             return next(new AppError("Subject description is required", 400));
+        }
+        if (!teacher) {
+            return next(new AppError("Subject Staff is required", 400));
         }
         if (!lessons || lessons.length === 0) {
             return next(new AppError("At least one lesson is required", 400));
         }
 
         const newSubject = await SubjectModel.create({
-            name,
+            name: subjectName,
             description,
-            teacherId,
+            teacherId: teacher,
             exams: [],
             lessions: lessons,
             assignments: [],

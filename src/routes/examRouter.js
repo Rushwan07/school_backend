@@ -13,6 +13,7 @@ router
     .delete(examController.deleteExam);
 
 router.route("/admin-exams").get(examController.getAdminExams);
+router.route("/class-exam/:classId").get(examController.getExamByClassId);
 router.route("/teacher-exams").get(verifyToken, examController.getTeacherExams);
 router.route("/student-exams").get(verifyToken, examController.getStudentExams);
 

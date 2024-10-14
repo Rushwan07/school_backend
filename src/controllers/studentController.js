@@ -255,7 +255,7 @@ exports.editStudent = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllStudentsGroupedByClass = catchAsync(async (req, res, next) => {
-    const students = await Class.find().populate("studentsId");
+    const students = await Class.find().populate("studentsId classId");
     // const students = await Student.aggregate([
     //     {
     //         $group: {

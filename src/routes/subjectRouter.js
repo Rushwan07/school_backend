@@ -12,6 +12,10 @@ router
 router.route("/:subjectId").put(subjectController.editSubject);
 
 router
+    .route("/subject-class/:classId")
+    .get(subjectController.getSubjectByClassId);
+
+router
     .route("/student-subject")
     .get(verifyToken, subjectController.getStudentSubjects);
 

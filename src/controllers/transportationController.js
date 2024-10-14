@@ -43,12 +43,17 @@ exports.createTransport = catchAsync(async (req, res, next) => {
             );
         }
     }
-
-    const newTransport = await Transport.create({
+    console.log({
         busNumber,
         stops,
         driverName,
         students,
+    });
+    const newTransport = await Transport.create({
+        busNumber,
+        stops,
+        driverName,
+        students: [],
     });
 
     res.status(201).json({
@@ -117,5 +122,13 @@ exports.editTransport = catchAsync(async (req, res, next) => {
         data: {
             transport,
         },
+    });
+});
+
+exports.getTransport = catchAsync(async (req, res, next) => {
+    const transport = await Transport.find();
+    res.status(200).json({
+        status: "success",
+        data: { transport },
     });
 });

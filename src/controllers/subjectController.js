@@ -90,14 +90,25 @@ exports.editSubject = catchAsync(async (req, res, next) => {
 exports.getStudentSubjects = catchAsync(async (req, res, next) => {
     console.log(req.user.classId);
     const classs = await Class.findById(req.user.classId);
-    console.log("*********");
-    console.log(classs);
-    console.log("*********");
 
     res.status(200).json({
         status: "success",
         data: {
-            s: "subject",
+            class: classs,
+        },
+    });
+});
+
+exports.getSubjectByClassId = catchAsync(async (req, res, next) => {
+    const { classId } = req.params;
+    console.log(classId);
+    const subjects = await Subject.find({ classId: classId });
+    console.log(subjects);
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            subjects: subjects,
         },
     });
 });

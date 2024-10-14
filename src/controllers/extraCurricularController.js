@@ -12,6 +12,7 @@ const AppError = require("../utils/appError");
 // }
 exports.createExtraCurricularActivity = catchAsync(async (req, res, next) => {
     const { name, description, duedate, fees, classId } = req.body;
+    console.log(req.body);
 
     if (!name || !description) {
         return next(
@@ -19,7 +20,7 @@ exports.createExtraCurricularActivity = catchAsync(async (req, res, next) => {
         );
     }
 
-    if (classId) {
+    if (classId.trim()) {
         const classExists = await Class.findById(classId);
         if (!classExists) {
             return next(
@@ -40,10 +41,12 @@ exports.createExtraCurricularActivity = catchAsync(async (req, res, next) => {
         classId: classId.trim() ? classId : null,
     });
 
+    const val = await extraCurricularActivity.populate("classId");
+
     res.status(201).json({
         status: "success",
         data: {
-            extraCurricularActivity,
+            extraCurricularActivity: val,
         },
     });
 });
@@ -100,7 +103,8 @@ exports.editExtraCurricularActivity = catchAsync(async (req, res, next) => {
     });
 });
 exports.getAdminExtraCurricularActivity = catchAsync(async (req, res, next) => {
-    const extraCurricularActivity = await ExtraCurricularActivities.find();
+    const extraCurricularActivity =
+        await ExtraCurricularActivities.find().populate("classId");
     res.status(200).json({
         status: "success",
         data: {
@@ -113,7 +117,7 @@ exports.getStudentExtraCurricularActivity = catchAsync(
         const classId = req.user.classId;
         const extraCurricularActivity = await ExtraCurricularActivities.find({
             $or: [{ classId: { $in: classId } }, { classId: null }],
-        });
+        }).populate("classId");
         res.status(200).json({
             status: "success",
             data: {
@@ -127,7 +131,7 @@ exports.getTeacherExtraCurricularActivity = catchAsync(
         const classId = req.user.classId;
         const extraCurricularActivity = await ExtraCurricularActivities.find({
             $or: [{ classId: { $in: classId } }, { classId: null }],
-        });
+        }).populate("classId");
         res.status(200).json({
             status: "success",
             data: {

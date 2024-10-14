@@ -10,7 +10,10 @@ router
     .post(classController.createClass)
     .get(classController.getClass);
 
-router.route("/:classId").put(classController.editClass);
+router
+    .route("/:classId")
+    .put(classController.editClass)
+    .get(classController.getClassWithStudent);
 
 router.route("/staff-class").get(verifyToken, classController.getStaffClasses);
 

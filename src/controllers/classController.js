@@ -207,3 +207,27 @@ exports.editClass = catchAsync(async (req, res, next) => {
         },
     });
 });
+
+exports.getClassWithStudent = catchAsync(async (req, res, next) => {
+    const { classId } = req.params;
+
+    const classData = await Class.findById(classId)
+        .populate({
+            path: "studentsId",
+            select: "regno name _id",
+        })
+        .populate({
+            path: "subjectsId",
+            select: "name _id",
+        });
+    const students = classData?.studentsId?.length ? classData.studentsId : [];
+    const subjects = classData?.subjectsId?.length ? classData.subjectsId : [];
+
+    return res.status(200).json({
+        status: "success",
+        data: {
+            students,
+            subjects,
+        },
+    });
+});

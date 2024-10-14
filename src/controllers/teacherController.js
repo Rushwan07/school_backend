@@ -95,7 +95,7 @@ exports.createTeacher = catchAsync(async (req, res, next) => {
     });
 });
 exports.editTeacher = catchAsync(async (req, res, next) => {
-    const { teacherId } = req.params; // Get the teacherId from the request params
+    const { teacherId } = req.params;
     const {
         username,
         password,
@@ -173,6 +173,17 @@ exports.getAllTeachers = catchAsync(async (req, res, next) => {
         status: "success",
         data: {
             teachers,
+        },
+    });
+});
+exports.getTeacherByID = catchAsync(async (req, res, next) => {
+    const { teacherId } = req.params; // Get the teacherId from the request params
+
+    const teacher = await Teacher.findById(teacherId).populate("classes subjects");
+    res.status(200).json({
+        status: "success",
+        data: {
+            teacher,
         },
     });
 });

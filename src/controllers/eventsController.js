@@ -135,7 +135,7 @@ exports.getEventForTeacher = catchAsync(async (req, res, next) => {
 
     const events = await Event.find({
         $or: [{ classId: { $in: classIds } }, { classId: null }],
-    });
+    }).populate("classId");
 
     res.status(200).json({
         status: "success",
@@ -146,7 +146,7 @@ exports.getEventForTeacher = catchAsync(async (req, res, next) => {
 });
 
 exports.getEventForAdmin = catchAsync(async (req, res, next) => {
-    const events = await Event.find();
+    const events = await Event.find().populate("classId");
     res.status(200).json({
         status: "success",
         data: {
@@ -159,7 +159,7 @@ exports.getEventForStudent = catchAsync(async (req, res, next) => {
 
     const events = await Event.find({
         $or: [{ classId: { $in: classIds } }, { classId: null }],
-    });
+    }).populate("classId");
 
     res.status(200).json({
         status: "success",

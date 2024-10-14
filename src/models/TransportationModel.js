@@ -19,10 +19,10 @@ const transportSchema = new mongoose.Schema({
                 type: String,
                 required: true,
             },
-            transportationFees: {
-                type: String,
-                required: true,
-            },
+            // transportationFees: {
+            //     type: String,
+            //     required: true,
+            // },
         },
     ],
     driverName: {

@@ -3,6 +3,7 @@ const SubjectModel = require("../models/SubjectModel");
 const Teacher = require("../models/TeacherModel");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
+const Attendance = require("../models/AttendanceModel");
 // {
 //     "name":"X A",
 //     "capacity":"10",
@@ -115,6 +116,47 @@ exports.getClass = catchAsync(async (req, res, next) => {
         status: "success",
         data: {
             class: classes,
+        },
+    });
+});
+
+exports.getClassForAttendance = catchAsync(async (req, res, next) => {
+    console.log("working fine");
+    const today = new Date();
+    const startOfDay = new Date(today.setHours(0, 0, 0, 0)); // Start of today
+    const endOfDay = new Date(today.setHours(23, 59, 59, 999)); // End of today
+
+    // Get all classes
+    const classes = await Class.find().populate(
+        "subjectsId studentsId teacherId"
+    );
+
+    console.log(classes);
+    const classWithAttendance = await Promise.all(
+        classes.map(async (singleClass) => {
+            const attendance = await Attendance.findOne({
+                date: { $gte: startOfDay, $lte: endOfDay },
+                classId: singleClass._id,
+            });
+
+            if (attendance) {
+                return {
+                    ...singleClass.toObject(), // Convert Mongoose document to plain object
+                    attendanceId: attendance._id, // Add attendance ID if found
+                };
+            } else {
+                return {
+                    ...singleClass.toObject(), // No attendance, return class data as is
+                };
+            }
+        })
+    );
+    console.log(classWithAttendance);
+    // Send response
+    res.status(200).json({
+        status: "success",
+        data: {
+            classes: classWithAttendance,
         },
     });
 });

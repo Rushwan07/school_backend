@@ -22,15 +22,7 @@ exports.createFeeRecord = catchAsync(async (req, res, next) => {
         totalFees,
         date,
     } = req.body;
-    console.log({
-        studentId,
-        regNo,
-        classId,
-        baseFees,
-        transportationFees,
-        totalFees,
-        date,
-    });
+
     if (
         !studentId ||
         !regNo ||
@@ -87,6 +79,17 @@ exports.getStudentFeesDetails = catchAsync(async (req, res, next) => {
         status: "status",
         data: {
             feesDetails,
+        },
+    });
+});
+
+exports.getFeesDetails = catchAsync(async (req, res, next) => {
+    const fees = await Fees.find().populate("studentId classId");
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            feesDetails: fees,
         },
     });
 });

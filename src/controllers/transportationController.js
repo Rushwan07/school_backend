@@ -8,7 +8,7 @@ const catchAsync = require("../utils/catchAsync");
 //             "stopNumber":"1",
 //             "place":"first place",
 //             "time":"11:30 AM",
-//             "transportationFees":"60"
+// //             "transportationFees":"60"
 //         }
 //     ],
 //     "driverName":"test driver"
@@ -37,11 +37,11 @@ exports.createTransport = catchAsync(async (req, res, next) => {
         if (!stop.time) {
             return next(new AppError("Each stop must have a time", 400));
         }
-        if (!stop.transportationFees || !stop.transportationFees.trim()) {
-            return next(
-                new AppError("Each stop must have transportation fees", 400)
-            );
-        }
+        // if (!stop.transportationFees || !stop.transportationFees.trim()) {
+        //     return next(
+        //         new AppError("Each stop must have transportation fees", 400)
+        //     );
+        // }
     }
     console.log({
         busNumber,
@@ -100,11 +100,11 @@ exports.editTransport = catchAsync(async (req, res, next) => {
             if (!stop.time) {
                 return next(new AppError("Each stop must have a time", 400));
             }
-            if (!stop.transportationFees || !stop.transportationFees.trim()) {
-                return next(
-                    new AppError("Each stop must have transportation fees", 400)
-                );
-            }
+            // if (!stop.transportationFees || !stop.transportationFees.trim()) {
+            //     return next(
+            //         new AppError("Each stop must have transportation fees", 400)
+            //     );
+            // }
         }
         transport.stops = stops;
     }

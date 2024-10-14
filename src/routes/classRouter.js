@@ -9,12 +9,11 @@ router
     .route("/")
     .post(classController.createClass)
     .get(classController.getClass);
-
+router.route("/class-attendance").get(classController.getClassForAttendance);
+router.route("/staff-class").get(verifyToken, classController.getStaffClasses);
 router
     .route("/:classId")
     .put(classController.editClass)
     .get(classController.getClassWithStudent);
-
-router.route("/staff-class").get(verifyToken, classController.getStaffClasses);
 
 module.exports = router;

@@ -6,6 +6,9 @@ const express = require("express");
 const router = express.Router();
 
 router.route("/create-fees").post(feesController.createFeeRecord);
+
+router.route("/").get(feesController.getFeesDetails);
+
 router
     .route("/student-fees")
     .get(verifyToken, feesController.getStudentFeesDetails);

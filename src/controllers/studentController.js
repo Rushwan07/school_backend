@@ -4,6 +4,7 @@ const Class = require("../models/ClassModel");
 const StudentTransport = require("../models/StudentTransportModel");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
+const FeesModel = require("../models/FeesModel");
 
 // {
 //     "student":{
@@ -79,7 +80,7 @@ exports.createStudent = catchAsync(async (req, res, next) => {
     if (transport && transport.busId) {
         const newTransport = await StudentTransport.create({
             studentId: null,
-            regNo: student.regno,
+            //regNo: student.regno,
             pickupLocation: transport.pickupLocation,
             dropOffLocation: transport.dropOffLocation,
             busId: transport.busId,
@@ -112,6 +113,14 @@ exports.createStudent = catchAsync(async (req, res, next) => {
     const studentClass = await Class.findById(student?.classId);
     studentClass.studentsId.push(newStudent._id);
     await studentClass.save();
+    await FeesModel.create({
+        studentId: newStudent._id,
+
+        classId: newStudent.classId,
+        baseFees: studentClass.baseFees,
+        transportationFees: transport.fees,
+        totalFees: Number(transport.fees) + Number(studentClass.baseFees),
+    });
 
     res.status(201).json({
         status: "success",

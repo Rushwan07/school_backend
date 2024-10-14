@@ -6,10 +6,7 @@ const FeesSchema = new mongoose.Schema({
         ref: "Student",
         required: true,
     },
-    regNo: {
-        type: String,
-        required: true,
-    },
+
     classId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Class",
@@ -33,7 +30,7 @@ const FeesSchema = new mongoose.Schema({
     },
     date: {
         type: Date,
-        required: true,
+        //required: true,
     },
 });
 

@@ -93,8 +93,8 @@ exports.createClass = catchAsync(async (req, res, next) => {
     await teacher.save();
 
     await SubjectModel.updateMany(
-        { _id: { $in: subjectIds } }, // Find all subjects by their IDs
-        { $set: { classId: newClass._id } } // Set classId to the new class's _id
+        { _id: { $in: subjectIds } },
+        { $set: { classId: newClass._id } }
     );
     const populatedClass = await Class.findById(newClass._id).populate(
         "teacherId"
@@ -123,15 +123,13 @@ exports.getClass = catchAsync(async (req, res, next) => {
 exports.getClassForAttendance = catchAsync(async (req, res, next) => {
     console.log("working fine");
     const today = new Date();
-    const startOfDay = new Date(today.setHours(0, 0, 0, 0)); // Start of today
-    const endOfDay = new Date(today.setHours(23, 59, 59, 999)); // End of today
+    const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(today.setHours(23, 59, 59, 999));
 
-    // Get all classes
     const classes = await Class.find().populate(
         "subjectsId studentsId teacherId"
     );
 
-    console.log(classes);
     const classWithAttendance = await Promise.all(
         classes.map(async (singleClass) => {
             const attendance = await Attendance.findOne({
@@ -141,18 +139,17 @@ exports.getClassForAttendance = catchAsync(async (req, res, next) => {
 
             if (attendance) {
                 return {
-                    ...singleClass.toObject(), // Convert Mongoose document to plain object
-                    attendanceId: attendance._id, // Add attendance ID if found
+                    ...singleClass.toObject(),
+                    attendanceId: attendance._id,
                 };
             } else {
                 return {
-                    ...singleClass.toObject(), // No attendance, return class data as is
+                    ...singleClass.toObject(),
                 };
             }
         })
     );
-    console.log(classWithAttendance);
-    // Send response
+
     res.status(200).json({
         status: "success",
         data: {
@@ -189,7 +186,8 @@ exports.editClass = catchAsync(async (req, res, next) => {
         announcementId,
         baseFees,
     } = req.body;
-
+    console.log("189");
+    console.log(subjectsId);
     const classToUpdate = await Class.findById(req.params.classId);
     if (!classToUpdate) {
         return next(new AppError("Class not found", 404));
@@ -231,21 +229,39 @@ exports.editClass = catchAsync(async (req, res, next) => {
         await newTeacher.save();
     }
 
+    // classToUpdate.subjectsId = subjectsId;
+    let subIds = [];
+
+    subIds = await Promise.all(
+        subjectsId.map(async (subject) => {
+            if (subject?._id) {
+                await SubjectModel.findByIdAndUpdate(subject._id, subject);
+                return subject._id; // Return the ID after updating
+            } else {
+                let tempSub = await SubjectModel.create(subject);
+                return tempSub._id; // Return the new ID after creation
+            }
+        })
+    );
+
     classToUpdate.name = name;
     classToUpdate.capacity = capacity;
     classToUpdate.teacherId = teacherId;
-    classToUpdate.subjectsId = subjectsId;
+    classToUpdate.subjectsId = subIds;
     classToUpdate.studentsId = studentsId;
     classToUpdate.eventId = eventId;
     classToUpdate.announcementId = announcementId;
     classToUpdate.baseFees = baseFees;
 
     await classToUpdate.save();
+    const populatedClass = await Class.findById(classToUpdate._id).populate(
+        "teacherId subjectsId"
+    );
 
     res.status(200).json({
         status: "success",
         data: {
-            class: classToUpdate,
+            class: populatedClass,
         },
     });
 });

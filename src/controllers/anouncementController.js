@@ -103,7 +103,6 @@ exports.deleteAnouncement = catchAsync(async (req, res, next) => {
 
 exports.getAnouncementsForAdmin = catchAsync(async (req, res, next) => {
     const announcement = await Announcement.find();
-
     res.status(201).json({
         status: "success",
         data: {
@@ -117,7 +116,8 @@ exports.getAnouncementsForStaff = catchAsync(async (req, res, next) => {
 
     const announcements = await Announcement.find({
         $or: [{ classId: { $in: teacherClassIds } }, { classId: null }],
-    });
+    }).populate("classId");
+
 
     res.status(200).json({
         status: "success",

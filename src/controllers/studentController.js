@@ -197,7 +197,7 @@ exports.editStudent = catchAsync(async (req, res, next) => {
             existingStudent.classId = student.classId;
         }
     }
-
+    console.log("student complted");
     if (parent) {
         let parentId = existingStudent.parentId;
         let existingParent = await Parent.findById(parentId);
@@ -228,8 +228,10 @@ exports.editStudent = catchAsync(async (req, res, next) => {
             existingStudent.parentId = newParent._id;
         }
     }
+    console.log("parent complted");
 
     if (transport?.busId) {
+        console.log(transport);
         let transportId = existingStudent.transportations;
         let existingTransport = await StudentTransport.findById(transportId);
 
@@ -244,7 +246,7 @@ exports.editStudent = catchAsync(async (req, res, next) => {
         } else {
             const newTransport = await StudentTransport.create({
                 studentId: existingStudent._id,
-                regNo: existingStudent.regno,
+
                 pickupLocation: transport.pickupLocation,
                 // dropOffLocation: transport.dropOffLocation,
                 busId: transport.busId,
@@ -255,6 +257,7 @@ exports.editStudent = catchAsync(async (req, res, next) => {
     } else {
         existingStudent.transportations = null;
     }
+    console.log("transport complted");
 
     await existingStudent.save();
 
@@ -267,15 +270,19 @@ exports.editStudent = catchAsync(async (req, res, next) => {
     });
     const studentClass = await Class.findById(student?.classId);
 
+    console.log(feesRecord);
+    console.log(transport);
     if (feesRecord) {
         feesRecord.classId = editedStudent.classId;
         feesRecord.baseFees = studentClass?.baseFees;
         feesRecord.transportationFees = transport?.fees || 0;
         feesRecord.totalFees =
-            Number(transport.fees || 0) + Number(studentClass?.baseFees || 0);
+            Number(transport?.fees || 0) + Number(studentClass?.baseFees || 0);
 
         await feesRecord.save();
     }
+    console.log("fees complted");
+
     res.status(200).json({
         status: "success",
         data: {

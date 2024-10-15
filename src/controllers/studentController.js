@@ -229,7 +229,7 @@ exports.editStudent = catchAsync(async (req, res, next) => {
         }
     }
 
-    if (transport) {
+    if (transport?.busId) {
         let transportId = existingStudent.transportations;
         let existingTransport = await StudentTransport.findById(transportId);
 
@@ -252,13 +252,30 @@ exports.editStudent = catchAsync(async (req, res, next) => {
             });
             existingStudent.transportations = newTransport._id;
         }
+    } else {
+        existingStudent.transportations = null;
     }
 
     await existingStudent.save();
+
     const editedStudent = await existingStudent.populate(
         "classId parentId transportations"
     );
 
+    const feesRecord = await FeesModel.findOne({
+        studentId: editedStudent._id,
+    });
+    const studentClass = await Class.findById(student?.classId);
+
+    if (feesRecord) {
+        feesRecord.classId = editedStudent.classId;
+        feesRecord.baseFees = studentClass?.baseFees;
+        feesRecord.transportationFees = transport?.fees || 0;
+        feesRecord.totalFees =
+            Number(transport.fees || 0) + Number(studentClass?.baseFees || 0);
+
+        await feesRecord.save();
+    }
     res.status(200).json({
         status: "success",
         data: {

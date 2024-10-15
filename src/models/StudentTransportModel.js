@@ -13,9 +13,9 @@ const StudentTransport = new mongoose.Schema({
     pickupLocation: {
         type: String,
     },
-    dropOffLocation: {
-        type: String,
-    },
+    // dropOffLocation: {
+    //     type: String,
+    // },
     busId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Transportation",

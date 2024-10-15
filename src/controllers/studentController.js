@@ -82,7 +82,7 @@ exports.createStudent = catchAsync(async (req, res, next) => {
             studentId: null,
             //regNo: student.regno,
             pickupLocation: transport.pickupLocation,
-            dropOffLocation: transport.dropOffLocation,
+            // dropOffLocation: transport.dropOffLocation,
             busId: transport.busId,
             fees: transport.fees,
         });
@@ -118,8 +118,9 @@ exports.createStudent = catchAsync(async (req, res, next) => {
 
         classId: newStudent.classId,
         baseFees: studentClass.baseFees,
-        transportationFees: transport.fees,
-        totalFees: Number(transport.fees) + Number(studentClass.baseFees),
+        transportationFees: transport?.fees || 0,
+        totalFees:
+            Number(transport.fees || 0) + Number(studentClass.baseFees || 0),
     });
 
     res.status(201).json({
@@ -235,8 +236,8 @@ exports.editStudent = catchAsync(async (req, res, next) => {
         if (existingTransport) {
             if (transport.pickupLocation)
                 existingTransport.pickupLocation = transport.pickupLocation;
-            if (transport.dropOffLocation)
-                existingTransport.dropOffLocation = transport.dropOffLocation;
+            // if (transport.dropOffLocation)
+            //     existingTransport.dropOffLocation = transport.dropOffLocation;
             if (transport.busId) existingTransport.busId = transport.busId;
             if (transport.fees) existingTransport.fees = transport.fees;
             await existingTransport.save();
@@ -245,7 +246,7 @@ exports.editStudent = catchAsync(async (req, res, next) => {
                 studentId: existingStudent._id,
                 regNo: existingStudent.regno,
                 pickupLocation: transport.pickupLocation,
-                dropOffLocation: transport.dropOffLocation,
+                // dropOffLocation: transport.dropOffLocation,
                 busId: transport.busId,
                 fees: transport.fees,
             });
@@ -254,11 +255,14 @@ exports.editStudent = catchAsync(async (req, res, next) => {
     }
 
     await existingStudent.save();
+    const editedStudent = await existingStudent.populate(
+        "classId parentId transportations"
+    );
 
     res.status(200).json({
         status: "success",
         data: {
-            student: existingStudent,
+            student: editedStudent,
         },
     });
 });
@@ -300,7 +304,9 @@ exports.getAllStudentsGroupedByClass = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllStudents = catchAsync(async (req, res, next) => {
-    const students = await Student.find().populate("classId");
+    const students = await Student.find().populate(
+        "classId parentId transportations"
+    );
     res.status(200).json({
         status: "success",
         data: {

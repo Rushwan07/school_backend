@@ -2,6 +2,7 @@ const Subject = require("../models/SubjectModel");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const Class = require("../models/ClassModel");
+const ClassModel = require("../models/ClassModel");
 // {
 //     "name":"tamil", "lessions":["lession1","lession2"], "description":"descriptin for the subject"
 // }
@@ -102,7 +103,11 @@ exports.getStudentSubjects = catchAsync(async (req, res, next) => {
 exports.getSubjectByClassId = catchAsync(async (req, res, next) => {
     const { classId } = req.params;
     console.log(classId);
-    const subjects = await Subject.find({ classId: classId });
+
+    const classes = await ClassModel.findById(classId).populate("subjectsId");
+    const subjects = classes.subjectsId;
+
+    // const subjects = await Subject.find({ classId: classId });
     console.log(subjects);
 
     res.status(200).json({

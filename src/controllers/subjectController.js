@@ -104,9 +104,16 @@ exports.getSubjectByClassId = catchAsync(async (req, res, next) => {
     const { classId } = req.params;
     console.log(classId);
 
-    const classes = await ClassModel.findById(classId).populate("subjectsId");
+    const classes = await ClassModel.findById(classId).populate({
+        path: "subjectsId",
+        populate: {
+            path: "teacherId",
+            model: "Teacher",
+            select: "name _id",
+        },
+    });
     const subjects = classes.subjectsId;
-
+    // await subjects.populate("teacherId");
     // const subjects = await Subject.find({ classId: classId });
     console.log(subjects);
 

@@ -36,7 +36,7 @@ exports.createEvent = catchAsync(async (req, res, next) => {
     }
 
     if (!startDate) {
-        return next(new AppError("Date is required", 400));
+        return next(new AppError("Select a valid date..", 400));
     }
 
     let dates;
@@ -49,12 +49,12 @@ exports.createEvent = catchAsync(async (req, res, next) => {
     const event = await Event.create({
         name: eventName,
         description,
-        classId: classId.trim() ? classId : null,
+        classId: classId != "--" ? classId : null,
         dates,
         startTime,
         endTime,
     });
-
+    await event.populate("classId");
     res.status(201).json({
         status: "success",
         data: {
@@ -74,30 +74,38 @@ exports.deleteEvent = catchAsync(async (req, res, next) => {
 });
 
 exports.editEvent = catchAsync(async (req, res, next) => {
-    console.log("done")
-    const { name: eventName, description, classId, dates: date, startTime, endTime } =
+    console.log("done");
+    const { eventName, description, classId, date, startTime, endTime } =
         req.body;
-    console.log("done1", eventName, description, classId, date, startTime, endTime)
+    console.log(
+        "done1",
+        eventName,
+        description,
+        classId,
+        date,
+        startTime,
+        endTime
+    );
 
     const { eventId } = req.params;
-    console.log("done3")
+    console.log("done3");
 
     let { startDate, dueDate } = date;
-    console.log("done4")
+    console.log("done4");
 
-    console.log(eventName, description, classId, date, startTime, endTime)
-    console.log("done5")
+    console.log(eventName, description, classId, date, startTime, endTime);
+    console.log("done5");
 
     if (!eventName || !description) {
         return next(new AppError("name, description  are required", 400));
     }
-    console.log("done6")
+    console.log("done6");
 
     if (!startDate) {
-        return next(new AppError("Date is required", 400));
+        return next(new AppError("Select a valid date...", 400));
     }
 
-    console.log("done7")
+    console.log("done7");
 
     let dates;
     if (startDate === dueDate) {
@@ -105,8 +113,7 @@ exports.editEvent = catchAsync(async (req, res, next) => {
     } else {
         dates = getDatesInRange(startDate, dueDate);
     }
-    console.log("done8")
-
+    console.log("done8");
 
     const event = await Event.findByIdAndUpdate(
         eventId,
@@ -120,8 +127,7 @@ exports.editEvent = catchAsync(async (req, res, next) => {
         },
         { new: true }
     );
-    console.log("done9")
-
+    console.log("done9");
 
     res.status(201).json({
         status: "success",

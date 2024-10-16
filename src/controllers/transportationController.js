@@ -63,6 +63,7 @@ exports.createTransport = catchAsync(async (req, res, next) => {
         },
     });
 });
+
 exports.editTransport = catchAsync(async (req, res, next) => {
     const { transportId } = req.params; // Get the transportId from the request params
     const { busNumber, stops, driverName, students } = req.body;
@@ -130,5 +131,14 @@ exports.getTransport = catchAsync(async (req, res, next) => {
     res.status(200).json({
         status: "success",
         data: { transport },
+    });
+});
+
+exports.deleteTransport = catchAsync(async (req, res, next) => {
+    const { transportId } = req.params;
+    await Transport.findByIdAndDelete(transportId);
+    res.status(200).json({
+        status: "success",
+        message: "Deleted successfully",
     });
 });

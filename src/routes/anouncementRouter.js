@@ -7,9 +7,9 @@ const router = express.Router();
 
 router.route("/").post(verifyToken, anouncementController.createAnnouncement);
 router
-    .route("/:anouncementId")
+    .route("/:announcementId")
     .put(anouncementController.editAnnouncement)
-    .delete(anouncementController.deleteAnouncement);
+    .delete(anouncementController.deleteAnnouncement);
 
 router
     .route("/admin-anouncement")

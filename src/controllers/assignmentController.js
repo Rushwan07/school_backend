@@ -14,12 +14,12 @@ const catchAsync = require("../utils/catchAsync");
 //     }
 
 exports.createAssignment = catchAsync(async (req, res, next) => {
-    console.log("Done0")
+    console.log("Done0");
 
     const { title, startDate, dueDate, description, classId, subjectId } =
         req.body;
 
-        console.log("Done")
+    console.log("Done");
     if (
         !title ||
         !startDate ||
@@ -35,7 +35,7 @@ exports.createAssignment = catchAsync(async (req, res, next) => {
             )
         );
     }
-    console.log("Done2")
+    console.log("Done2");
 
     const classExists = await Class.findById(classId);
     if (!classExists) {
@@ -55,7 +55,8 @@ exports.createAssignment = catchAsync(async (req, res, next) => {
         classId,
         subjectId,
     });
-    console.log("Done3")
+    await newAssignment.populate("classId subjectId");
+    console.log("Done3");
 
     res.status(201).json({
         status: "success",
@@ -113,6 +114,7 @@ exports.editAssignment = catchAsync(async (req, res, next) => {
         },
         { new: true }
     );
+    await editedAssignment.populate("classId subjectId");
     res.status(201).json({
         status: "success",
         data: {
@@ -135,7 +137,7 @@ exports.deleteAssignment = catchAsync(async (req, res, next) => {
 });
 
 exports.getAssignmentsForAdmin = catchAsync(async (req, res, next) => {
-    const assignments = await Assignment.find();
+    const assignments = await Assignment.find().populate("classId subjectId");
 
     res.status(200).json({
         status: "success",

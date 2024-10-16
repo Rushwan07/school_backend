@@ -94,7 +94,7 @@ exports.editExtraCurricularActivity = catchAsync(async (req, res, next) => {
             },
             { new: true }
         );
-
+    await extraCurricularActivity.populate("classId");
     res.status(201).json({
         status: "success",
         data: {

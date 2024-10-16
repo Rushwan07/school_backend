@@ -59,7 +59,7 @@ exports.createExam = catchAsync(async (req, res, next) => {
         classId,
         subjects,
     });
-
+    await exam.populate("classId subjects.subjectId");
     res.status(201).json({
         status: "success",
         data: {
@@ -77,7 +77,7 @@ exports.editExam = catchAsync(async (req, res, next) => {
             new AppError("Subjects array is required and cannot be empty", 400)
         );
     }
-
+    console.log(subjects);
     for (let i = 0; i < subjects.length; i++) {
         const { subjectId, date } = subjects[i];
 
@@ -117,6 +117,7 @@ exports.editExam = catchAsync(async (req, res, next) => {
         },
         { new: true }
     );
+    await exam.populate("classId subjects.subjectId");
 
     res.status(201).json({
         status: "success",
@@ -135,7 +136,9 @@ exports.deleteExam = catchAsync(async (req, res, next) => {
     });
 });
 exports.getAdminExams = catchAsync(async (req, res, next) => {
-    const exam = await Exam.find().populate("classId");
+    const exam = await Exam.find()
+        .populate("classId")
+        .populate("subjects.subjectId");
 
     res.status(201).json({
         status: "success",

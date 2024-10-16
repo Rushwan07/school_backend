@@ -120,7 +120,7 @@ exports.editEvent = catchAsync(async (req, res, next) => {
         {
             name: eventName,
             description,
-            classId,
+            classId: classId != "--" ? classId : null,
             dates,
             startTime,
             endTime,

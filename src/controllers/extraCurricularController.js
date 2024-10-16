@@ -20,7 +20,7 @@ exports.createExtraCurricularActivity = catchAsync(async (req, res, next) => {
         );
     }
 
-    if (classId.trim()) {
+    if (classId.trim() && classId != "--") {
         const classExists = await Class.findById(classId);
         if (!classExists) {
             return next(
@@ -38,7 +38,7 @@ exports.createExtraCurricularActivity = catchAsync(async (req, res, next) => {
         description,
         duedate,
         fees: fees > 0 ? fees : null,
-        classId: classId.trim() ? classId : null,
+        classId: classId != "--" ? classId : null,
     });
 
     const val = await extraCurricularActivity.populate("classId");
@@ -69,7 +69,7 @@ exports.editExtraCurricularActivity = catchAsync(async (req, res, next) => {
         );
     }
 
-    if (classId) {
+    if (classId.trim() && classId != "--") {
         const classExists = await Class.findById(classId);
         if (!classExists) {
             return next(
@@ -90,7 +90,7 @@ exports.editExtraCurricularActivity = catchAsync(async (req, res, next) => {
                 description,
                 duedate,
                 fees: fees > 0 ? fees : null,
-                classId: classId.trim() ? classId : null,
+                classId: classId != "--" ? classId : null,
             },
             { new: true }
         );

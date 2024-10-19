@@ -73,7 +73,7 @@ exports.createFeeRecord = catchAsync(async (req, res, next) => {
 
 exports.getStudentFeesDetails = catchAsync(async (req, res, next) => {
     const _id = req.user._id;
-    const feesDetails = await Fees.find({ studentId: _id });
+    const feesDetails = await Fees.find({ studentId: _id }).populate("classId studentId");
 
     res.status(200).json({
         status: "status",
@@ -82,6 +82,34 @@ exports.getStudentFeesDetails = catchAsync(async (req, res, next) => {
         },
     });
 });
+
+
+exports.updateFeesPaymentStatus = catchAsync(async (req, res, next) => {
+    const _id = req.user._id;
+    console.log(_id)
+
+    const feesDetails = await Fees.findOneAndUpdate(
+        { studentId: _id },
+        { isPaid: true },
+        { new: true }
+    );
+    console.log("1")
+
+
+    if (!feesDetails) {
+        return next(new AppError("No fees record found for this student", 404));
+    }
+
+    console.log("_id")
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            feesDetails,
+        },
+    });
+});
+
 
 exports.getFeesDetails = catchAsync(async (req, res, next) => {
     const fees = await Fees.find().populate("studentId classId");

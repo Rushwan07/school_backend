@@ -179,7 +179,7 @@ exports.getAllTeachers = catchAsync(async (req, res, next) => {
 exports.getTeacherByID = catchAsync(async (req, res, next) => {
     const { teacherId } = req.params; // Get the teacherId from the request params
 
-    const teacher = await Teacher.findById(teacherId).populate("classes subjects");
+    const teacher = await Teacher.findById(teacherId).populate("classes");
     res.status(200).json({
         status: "success",
         data: {

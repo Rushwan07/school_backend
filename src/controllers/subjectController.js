@@ -90,7 +90,7 @@ exports.editSubject = catchAsync(async (req, res, next) => {
 
 exports.getStudentSubjects = catchAsync(async (req, res, next) => {
     console.log(req.user.classId);
-    const classs = await Class.findById(req.user.classId).populate("teacherId");
+    const classs = await Class.findById(req.user.classId).populate("teacherId subjectsId");
 
     res.status(200).json({
         status: "success",
@@ -108,8 +108,7 @@ exports.getSubjectByClassId = catchAsync(async (req, res, next) => {
         path: "subjectsId",
         populate: {
             path: "teacherId",
-            model: "Teacher",
-            select: "name _id",
+
         },
     });
     const subjects = classes.subjectsId;

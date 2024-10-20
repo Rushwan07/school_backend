@@ -149,8 +149,7 @@ exports.getAdminExams = catchAsync(async (req, res, next) => {
 });
 exports.getTeacherExams = catchAsync(async (req, res, next) => {
     const classId = req.user.classId;
-    const exam = await Exam.find({ classId: { $in: classId } });
-
+    const exam = await Exam.find({ classId: { $in: classId } }).populate("classId subjects");
     res.status(201).json({
         status: "success",
         data: {

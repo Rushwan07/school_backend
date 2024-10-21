@@ -151,8 +151,14 @@ exports.getStudent = catchAsync(async (req, res, next) => {
 });
 
 exports.editStudent = catchAsync(async (req, res, next) => {
+    console.log("req")
+
     const { studentId } = req.params;
+    console.log(studentId)
+
     const { student, parent, transport } = req.body;
+    console.log(student, parent, transport)
+
 
     // Find the student
     const existingStudent = await Student.findById(studentId);

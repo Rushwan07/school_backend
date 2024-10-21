@@ -196,3 +196,42 @@ exports.editAttendance = catchAsync(async (req, res, next) => {
         },
     });
 });
+
+exports.getAttendanceForStudent = catchAsync(async (req, res, next) => {
+    const { _id } = req.user;
+
+    console.log(_id);
+
+    const attendance = await Student.findById(_id).select(
+        "absentDays presentDays"
+    );
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            attendance: attendance,
+        },
+    });
+});
+
+exports.getAttendanceByClassId = catchAsync(async (req, res, next) => {
+    const classId = req.params.classId;
+
+    const currentDate = new Date().toDateString();
+
+    const attendance = await Attendance.find({ classId: classId }).populate(
+        "students.studentId"
+    );
+
+    const filteredAttendance = attendance.filter((record) => {
+        return new Date(record.date).toDateString() === currentDate;
+    });
+
+    console.log(filteredAttendance);
+    res.status(200).json({
+        status: "success",
+        data: {
+            attendance: filteredAttendance,
+        },
+    });
+});

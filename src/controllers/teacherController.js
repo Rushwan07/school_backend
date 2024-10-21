@@ -187,3 +187,13 @@ exports.getTeacherByID = catchAsync(async (req, res, next) => {
         },
     });
 });
+
+exports.getTeacherCount = catchAsync(async (req, res, next) => {
+    const teacherCount = await Teacher.countDocuments();
+    res.status(200).json({
+        status: "success",
+        data: {
+            teacherCount,
+        },
+    });
+});

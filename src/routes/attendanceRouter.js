@@ -17,4 +17,6 @@ router
     .route("/class-attendance/:classId")
     .get(attendanceController.getAttendanceByClassId);
 
+router.route("/admin-chart").get(attendanceController.getAttendanceChartData);
+
 module.exports = router;

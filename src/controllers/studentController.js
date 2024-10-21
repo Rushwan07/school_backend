@@ -151,14 +151,13 @@ exports.getStudent = catchAsync(async (req, res, next) => {
 });
 
 exports.editStudent = catchAsync(async (req, res, next) => {
-    console.log("req")
+    console.log("req");
 
     const { studentId } = req.params;
-    console.log(studentId)
+    console.log(studentId);
 
     const { student, parent, transport } = req.body;
-    console.log(student, parent, transport)
-
+    console.log(student, parent, transport);
 
     // Find the student
     const existingStudent = await Student.findById(studentId);
@@ -341,6 +340,54 @@ exports.getAllStudents = catchAsync(async (req, res, next) => {
         status: "success",
         data: {
             students,
+        },
+    });
+});
+
+exports.getGenderCount = catchAsync(async (req, res, next) => {
+    const genderCounts = await Student.aggregate([
+        {
+            $group: {
+                _id: "$sex",
+                count: { $sum: 1 },
+            },
+        },
+        {
+            $project: {
+                _id: 0,
+                category: {
+                    $cond: {
+                        if: { $eq: ["$_id", "MALE"] },
+                        then: "Boys",
+                        else: "Girls",
+                    },
+                },
+                count: 1,
+                fill: {
+                    $cond: {
+                        if: { $eq: ["$_id", "MALE"] },
+                        then: "var(--color-boys)",
+                        else: "var(--color-girls)",
+                    },
+                },
+            },
+        },
+    ]);
+
+    res.status(200).json({
+        status: "success",
+        data: { chartData: genderCounts },
+    });
+});
+
+exports.getStudentsCount = catchAsync(async (req, res, next) => {
+    const count = await Student.countDocuments();
+    console.log("count");
+    console.log(count);
+    res.status(200).json({
+        status: "success",
+        data: {
+            count,
         },
     });
 });

@@ -13,16 +13,17 @@ exports.createFeeRecord = catchAsync(async (req, res, next) => {
         date,
     } = req.body;
 
-
     if (!studentId || !classId || !fees || !date) {
         return next(new AppError("All fields are required", 400));
     }
 
-    const studentExists = await Student.findById(studentId);
+    // Check if the student exists
+    const studentExists = await Student.findById(studentId).populate('transportations'); // Assuming transportation is a ref to another model
     if (!studentExists) {
         return next(new AppError(`Student with id ${studentId} does not exist`, 404));
     }
 
+    // Check if the class exists
     const classExists = await Class.findById(classId);
     if (!classExists) {
         return next(new AppError(`Class with id ${classId} does not exist`, 404));
@@ -32,7 +33,11 @@ exports.createFeeRecord = catchAsync(async (req, res, next) => {
 
     const feesWithBase = [...fees, { name: "Base Fee", fee: baseFees }];
 
-    // Calculate total fees
+    const transportationFee = studentExists.transportations ? studentExists.transportations.fees : 0;
+    if (transportationFee) {
+        feesWithBase.push({ name: "Transportation Fee", fee: transportationFee });
+    }
+
     const total = feesWithBase.reduce((acc, fee) => acc + Number(fee.fee), 0);
 
     const feeRecord = await Fees.create({
@@ -50,6 +55,7 @@ exports.createFeeRecord = catchAsync(async (req, res, next) => {
         },
     });
 });
+
 
 // Get all fees details
 exports.getFeesDetails = catchAsync(async (req, res, next) => {

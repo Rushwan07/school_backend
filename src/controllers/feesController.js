@@ -3,63 +3,43 @@ const Student = require("../models/StudentModel");
 const Class = require("../models/ClassModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
-// {
-//     "studentId":"670504cf9d81be21a0a06e3e",
-//     "regNo":"101",
-//     "classId":"6704ec91fee39a5e6ebd0162",
-//     "baseFees":"500",
-//     "transportationFees":"200",
-//     "totalFees":"700",
-//     "date":"2024-10-03"
-//     }
+
+// Create a fee record
 exports.createFeeRecord = catchAsync(async (req, res, next) => {
     const {
         studentId,
-        regNo,
         classId,
-        baseFees,
-        transportationFees,
-        totalFees,
+        fees,
         date,
     } = req.body;
 
-    if (
-        !studentId ||
-        !regNo ||
-        !classId ||
-        !baseFees ||
-        !transportationFees ||
-        !totalFees ||
-        !date
-    ) {
+
+    if (!studentId || !classId || !fees || !date) {
         return next(new AppError("All fields are required", 400));
     }
 
     const studentExists = await Student.findById(studentId);
     if (!studentExists) {
-        return next(
-            new AppError(`Student with id ${studentId} does not exist`, 404)
-        );
+        return next(new AppError(`Student with id ${studentId} does not exist`, 404));
     }
 
     const classExists = await Class.findById(classId);
     if (!classExists) {
-        return next(
-            new AppError(`Class with id ${classId} does not exist`, 404)
-        );
+        return next(new AppError(`Class with id ${classId} does not exist`, 404));
     }
 
-    if (isNaN(Date.parse(date))) {
-        return next(new AppError("Invalid date format for due date", 400));
-    }
+    const baseFees = classExists.baseFees;
+
+    const feesWithBase = [...fees, { name: "Base Fee", fee: baseFees }];
+
+    // Calculate total fees
+    const total = feesWithBase.reduce((acc, fee) => acc + Number(fee.fee), 0);
 
     const feeRecord = await Fees.create({
         studentId,
-        regNo,
         classId,
-        baseFees,
-        transportationFees,
-        totalFees,
+        fees: feesWithBase,
+        total,
         date,
     });
 
@@ -71,36 +51,49 @@ exports.createFeeRecord = catchAsync(async (req, res, next) => {
     });
 });
 
-exports.getStudentFeesDetails = catchAsync(async (req, res, next) => {
-    const _id = req.user._id;
-    const feesDetails = await Fees.find({ studentId: _id }).populate("classId studentId");
+// Get all fees details
+exports.getFeesDetails = catchAsync(async (req, res, next) => {
+    const feesDetails = await Fees.find().populate("studentId classId");
 
     res.status(200).json({
-        status: "status",
+        status: "success",
         data: {
             feesDetails,
         },
     });
 });
 
+// Get fees details for a specific student
+exports.getFeesByStudentId = catchAsync(async (req, res, next) => {
+    const studentId = req.user._id;
 
+    const feesDetails = await Fees.find({ studentId }).populate("classId studentId");
+
+    if (!feesDetails.length) {
+        return next(new AppError("No fees records found for this student", 404));
+    }
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            feesDetails,
+        },
+    });
+});
+
+// Update payment status of fees
 exports.updateFeesPaymentStatus = catchAsync(async (req, res, next) => {
-    const _id = req.user._id;
-    console.log(_id)
+    const { feeId } = req.params; // Assuming feeId is passed in the URL
 
-    const feesDetails = await Fees.findOneAndUpdate(
-        { studentId: _id },
+    const feesDetails = await Fees.findByIdAndUpdate(
+        feeId,
         { isPaid: true },
         { new: true }
     );
-    console.log("1")
-
 
     if (!feesDetails) {
-        return next(new AppError("No fees record found for this student", 404));
+        return next(new AppError("No fees record found with this ID", 404));
     }
-
-    console.log("_id")
 
     res.status(200).json({
         status: "success",
@@ -110,14 +103,41 @@ exports.updateFeesPaymentStatus = catchAsync(async (req, res, next) => {
     });
 });
 
+// Get fees details for a specific class
+exports.getFeesByClass = catchAsync(async (req, res, next) => {
+    const { classId } = req.params;
 
-exports.getFeesDetails = catchAsync(async (req, res, next) => {
-    const fees = await Fees.find().populate("studentId classId");
+    const feesDetails = await Fees.find({ classId }).populate("studentId");
+
+    if (!feesDetails.length) {
+        return next(new AppError("No fees records found for this class", 404));
+    }
 
     res.status(200).json({
         status: "success",
         data: {
-            feesDetails: fees,
+            feesDetails,
         },
     });
 });
+
+exports.getById = catchAsync(async (req, res, next) => {
+    const { id } = req.params;
+
+    const feesDetails = await Fees.findById(id).populate("studentId classId");
+
+    if (!feesDetails) {
+        return res.status(404).json({
+            status: "fail",
+            message: "No fees details found with that ID."
+        });
+    }
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            feesDetails,
+        },
+    });
+});
+

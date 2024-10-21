@@ -6,23 +6,24 @@ const FeesSchema = new mongoose.Schema({
         ref: "Student",
         required: true,
     },
-
     classId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Class",
         required: true,
     },
-    baseFees: {
+    fees: [{
+        name: {
+            type: String,
+            required: true
+        },
+        fee: {
+            type: Number,
+            required: true
+        }
+    }],
+    total: {
         type: Number,
-        required: true,
-    },
-    transportationFees: {
-        type: Number,
-        required: true,
-    },
-    totalFees: {
-        type: Number,
-        required: true,
+        required: true
     },
     isPaid: {
         type: Boolean,
@@ -30,7 +31,7 @@ const FeesSchema = new mongoose.Schema({
     },
     date: {
         type: Date,
-        //required: true,
+        // required: true, // Uncomment this if you want the date to be mandatory
     },
 });
 

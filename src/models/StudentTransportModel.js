@@ -5,10 +5,10 @@ const StudentTransport = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Student",
     },
-    // regNo: {
-    //     type: String,
-    //     unique: true,
-    // },
+    regNo: {
+        type: String,
+        unique: true,
+    },
 
     pickupLocation: {
         type: String,

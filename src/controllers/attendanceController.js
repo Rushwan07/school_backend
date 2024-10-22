@@ -217,23 +217,45 @@ exports.getAttendanceForStudent = catchAsync(async (req, res, next) => {
 exports.getAttendanceByClassId = catchAsync(async (req, res, next) => {
     const classId = req.params.classId;
 
-    const currentDate = new Date().toDateString();
+    // Check if a date is provided in the request query
+    const queryDate = req.query.date
+        ? new Date(req.query.date).toDateString()
+        : new Date().toDateString();
 
-    const attendance = await Attendance.find({ classId: classId }).populate(
-        "students.studentId"
-    );
+    try {
+        // Fetch the attendance for the class
+        const attendance = await Attendance.find({ classId: classId }).populate(
+            "students.studentId"
+        );
 
-    const filteredAttendance = attendance.filter((record) => {
-        return new Date(record.date).toDateString() === currentDate;
-    });
+        // Filter attendance records by the provided date or today's date
+        const filteredAttendance = attendance.filter((record) => {
+            return new Date(record.date).toDateString() === queryDate;
+        });
 
-    console.log(filteredAttendance);
-    res.status(200).json({
-        status: "success",
-        data: {
-            attendance: filteredAttendance,
-        },
-    });
+        // If no attendance records are found for the given date, return an error
+        if (filteredAttendance.length === 0) {
+            return res.status(404).json({
+                status: "error",
+                message: `No attendance records found for the date: ${queryDate}`,
+            });
+        }
+
+        // If attendance is found, return it
+        res.status(200).json({
+            status: "success",
+            data: {
+                attendance: filteredAttendance,
+            },
+        });
+    } catch (error) {
+        // Handle any errors that occur
+        return res.status(500).json({
+            status: "error",
+            message: "An error occurred while fetching the attendance",
+            error: error.message,
+        });
+    }
 });
 exports.getAttendanceChartData = catchAsync(async (req, res, next) => {
     const year = "2024";

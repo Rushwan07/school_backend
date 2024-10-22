@@ -113,7 +113,10 @@ exports.createStudent = catchAsync(async (req, res, next) => {
     const studentClass = await Class.findById(student?.classId);
     studentClass.studentsId.push(newStudent._id);
     await studentClass.save();
-    await FeesModel.create({
+
+    console.log("fees started");
+
+    console.log({
         studentId: newStudent._id,
 
         classId: newStudent.classId,
@@ -123,6 +126,16 @@ exports.createStudent = catchAsync(async (req, res, next) => {
             Number(transport.fees || 0) + Number(studentClass.baseFees || 0),
     });
 
+    await FeesModel.create({
+        studentId: newStudent._id,
+
+        classId: newStudent.classId,
+        baseFees: studentClass.baseFees,
+        transportationFees: transport?.fees || 0,
+        totalFees:
+            Number(transport.fees || 0) + Number(studentClass.baseFees || 0),
+    });
+    console.log("fees created");
     res.status(201).json({
         status: "success",
         data: {

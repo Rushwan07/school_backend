@@ -126,7 +126,7 @@ exports.createStudent = catchAsync(async (req, res, next) => {
                 fee: transport?.fees || 0
             }
         ],
-        total: (studentClass.baseFees || 0) + (transport?.fees || 0),
+        total: Number(studentClass.baseFees || 0) + Number(transport?.fees || 0),
         date: new Date()
     });
 
@@ -311,7 +311,7 @@ exports.editStudent = catchAsync(async (req, res, next) => {
         ];
 
         // Calculate total
-        feesRecord.total = (studentClass?.baseFees || 0) + (transport?.fees || 0);
+        feesRecord.total = Number(studentClass?.baseFees || 0) + Number(transport?.fees || 0);
 
         await feesRecord.save();
     }

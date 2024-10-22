@@ -17,5 +17,6 @@ router.patch(
 router.get("/class/:classId", feesController.getFeesByClass);
 router.get("/std", verifyToken, feesController.getFeesByStudentId);
 router.get("/:id", feesController.getById);
+router.put("/edit/:id", feesController.editFees);
 
 module.exports = router;

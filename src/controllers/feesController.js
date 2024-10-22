@@ -147,3 +147,31 @@ exports.getById = catchAsync(async (req, res, next) => {
     });
 });
 
+
+exports.editFees = catchAsync(async (req, res, next) => {
+    const { id } = req.params;
+    const { fees, date } = req.body;
+
+    console.log(fees, date);
+
+    const totalFees = fees.reduce((total, fee) => total + (Number(fee.fee) || 0), 0);
+    const updatedFees = await Fees.findByIdAndUpdate(
+        id,
+        { fees, date, total: totalFees }, 
+        { new: true, runValidators: true }
+    ).populate("studentId classId");
+
+    if (!updatedFees) {
+        return res.status(404).json({
+            status: "fail",
+            message: "No fees details found with that ID."
+        });
+    }
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            feesDetails: updatedFees,
+        },
+    });
+});

@@ -118,12 +118,19 @@ exports.createStudent = catchAsync(async (req, res, next) => {
 
     console.log({
         studentId: newStudent._id,
-
         classId: newStudent.classId,
-        baseFees: studentClass.baseFees,
-        transportationFees: transport?.fees || 0,
-        totalFees:
-            Number(transport.fees || 0) + Number(studentClass.baseFees || 0),
+        fees: [
+            {
+                name: "Base Fees",
+                fee: studentClass.baseFees || 0
+            },
+            {
+                name: "Transportation Fees",
+                fee: transport?.fees || 0
+            }
+        ],
+        total: Number(studentClass.baseFees || 0) + Number(transport?.fees || 0),
+        date: new Date()
     });
 
     await FeesModel.create({
@@ -251,7 +258,9 @@ exports.editStudent = catchAsync(async (req, res, next) => {
     if (transport?.busId) {
         console.log(transport);
         let transportId = existingStudent.transportations;
+        console.log("transportId>>>>>>>>>>>>/???", transportId)
         let existingTransport = await StudentTransport.findById(transportId);
+        console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>/", existingTransport);
 
         if (existingTransport) {
             if (transport.pickupLocation)
@@ -262,18 +271,26 @@ exports.editStudent = catchAsync(async (req, res, next) => {
             if (transport.fees) existingTransport.fees = transport.fees;
             await existingTransport.save();
         } else {
+            console.log("In else", transport)
             const newTransport = await StudentTransport.create({
                 studentId: existingStudent._id,
-
                 pickupLocation: transport.pickupLocation,
                 // dropOffLocation: transport.dropOffLocation,
+                regNo: existingStudent.regno,
                 busId: transport.busId,
                 fees: transport.fees,
             });
+            console.log("1")
+
             existingStudent.transportations = newTransport._id;
+            console.log("2")
+
         }
     } else {
         existingStudent.transportations = null;
+        const result = await StudentTransport.deleteOne({ studentId: existingStudent._id });
+        console.log(result)
+
     }
     console.log("transport complted");
 
@@ -286,19 +303,32 @@ exports.editStudent = catchAsync(async (req, res, next) => {
     const feesRecord = await FeesModel.findOne({
         studentId: editedStudent._id,
     });
+    console.log("feesRecord>>>>>", feesRecord)
     const studentClass = await Class.findById(student?.classId);
 
-    console.log(feesRecord);
+    // console.log(feesRecord);
     console.log(transport);
     if (feesRecord) {
         feesRecord.classId = editedStudent.classId;
-        feesRecord.baseFees = studentClass?.baseFees;
-        feesRecord.transportationFees = transport?.fees || 0;
-        feesRecord.totalFees =
-            Number(transport?.fees || 0) + Number(studentClass?.baseFees || 0);
+
+        // Update the fees array
+        feesRecord.fees = [
+            {
+                name: "Base Fees",
+                fee: studentClass?.baseFees || 0
+            },
+            {
+                name: "Transportation Fees",
+                fee: transport?.fees || 0
+            }
+        ];
+
+        // Calculate total
+        feesRecord.total = Number(studentClass?.baseFees || 0) + Number(transport?.fees || 0);
 
         await feesRecord.save();
     }
+
     console.log("fees complted");
 
     res.status(200).json({

@@ -303,31 +303,44 @@ exports.editStudent = catchAsync(async (req, res, next) => {
     const feesRecord = await FeesModel.findOne({
         studentId: editedStudent._id,
     });
-    console.log("feesRecord>>>>>", feesRecord)
-    const studentClass = await Class.findById(student?.classId);
+    console.log("feesRecord>>>>>", feesRecord);
 
-    // console.log(feesRecord);
+    const studentClass = await Class.findById(student?.classId);
     console.log(transport);
+
     if (feesRecord) {
         feesRecord.classId = editedStudent.classId;
 
-        // Update the fees array
-        feesRecord.fees = [
-            {
+        // Update or add fees
+        const baseFeesIndex = feesRecord.fees.findIndex(fee => fee.name === "Base Fees");
+        const transportFeesIndex = feesRecord.fees.findIndex(fee => fee.name === "Transportation Fees");
+
+        // Update or add Base Fees
+        if (baseFeesIndex !== -1) {
+            feesRecord.fees[baseFeesIndex].fee = Number(studentClass?.baseFees) || 0;
+        } else {
+            feesRecord.fees.push({
                 name: "Base Fees",
-                fee: studentClass?.baseFees || 0
-            },
-            {
+                fee: Number(studentClass?.baseFees) || 0
+            });
+        }
+
+        // Update or add Transportation Fees
+        if (transportFeesIndex !== -1) {
+            feesRecord.fees[transportFeesIndex].fee = Number(transport?.fees) || 0;
+        } else {
+            feesRecord.fees.push({
                 name: "Transportation Fees",
-                fee: transport?.fees || 0
-            }
-        ];
+                fee: Number(transport?.fees) || 0
+            });
+        }
 
         // Calculate total
-        feesRecord.total = Number(studentClass?.baseFees || 0) + Number(transport?.fees || 0);
+        feesRecord.total = feesRecord.fees.reduce((sum, fee) => sum + Number(fee.fee), 0);
 
         await feesRecord.save();
     }
+
 
     console.log("fees complted");
 

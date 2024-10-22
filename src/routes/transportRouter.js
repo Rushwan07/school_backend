@@ -7,6 +7,9 @@ router.route("/").get(transportController.getTransport);
 
 router.route("/create-transport").post(transportController.createTransport);
 router
+    .route("/admin-transport-count")
+    .get(transportController.getTransportCount);
+router
     .route("/:transportId")
     .put(transportController.editTransport)
     .delete(transportController.deleteTransport);

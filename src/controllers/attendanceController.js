@@ -235,3 +235,57 @@ exports.getAttendanceByClassId = catchAsync(async (req, res, next) => {
         },
     });
 });
+exports.getAttendanceChartData = catchAsync(async (req, res, next) => {
+    const year = "2024";
+
+    const allMonths = Array.from({ length: 12 }, (_, i) => {
+        const month = (i + 1).toString().padStart(2, "0");
+        return `${year}-${month}`;
+    });
+
+    const chartData = await AttendanceCount.aggregate([
+        {
+            $project: {
+                month: { $dateToString: { format: "%Y-%m", date: "$date" } },
+                presentCount: 1,
+                totalStudents: 1,
+            },
+        },
+        {
+            $group: {
+                _id: "$month",
+                averageAttendance: {
+                    $avg: {
+                        $multiply: [
+                            { $divide: ["$presentCount", "$totalStudents"] },
+                            100,
+                        ],
+                    },
+                },
+            },
+        },
+        {
+            $project: {
+                _id: 0,
+                month: "$_id",
+                attendance: { $round: ["$averageAttendance", 0] },
+            },
+        },
+        {
+            $sort: { month: 1 },
+        },
+    ]);
+
+    const fullChartData = allMonths.map((month) => {
+        const monthData = chartData.find((data) => data.month === month);
+        return {
+            month,
+            attendance: monthData ? monthData.attendance : 0,
+        };
+    });
+
+    res.status(200).json({
+        status: "success",
+        data: { chartData: fullChartData },
+    });
+});

@@ -142,3 +142,13 @@ exports.deleteTransport = catchAsync(async (req, res, next) => {
         message: "Deleted successfully",
     });
 });
+
+exports.getTransportCount = catchAsync(async (req, res, next) => {
+    const transportCount = await Transport.countDocuments();
+    res.status(200).json({
+        status: "success",
+        data: {
+            transportCount,
+        },
+    });
+});

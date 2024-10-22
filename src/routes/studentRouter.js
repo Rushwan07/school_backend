@@ -10,6 +10,9 @@ router
     .get(studentController.getAllStudentsGroupedByClass);
 router.route("/all-students").get(studentController.getAllStudents);
 
+router.route("/admin-gender-count").get(studentController.getGenderCount);
+router.route("/admin-student-count").get(studentController.getStudentsCount);
+
 router
     .route("/:studentId")
     .get(studentController.getStudent)

@@ -8,7 +8,11 @@ router.post("/create-fees", feesController.createFeeRecord);
 
 router.get("/", feesController.getFeesDetails);
 
-router.patch("/update-status/:feeId", verifyToken, feesController.updateFeesPaymentStatus);
+router.patch(
+    "/update-status/:feeId",
+    verifyToken,
+    feesController.updateFeesPaymentStatus
+);
 
 router.get("/class/:classId", feesController.getFeesByClass);
 router.get("/std", verifyToken, feesController.getFeesByStudentId);

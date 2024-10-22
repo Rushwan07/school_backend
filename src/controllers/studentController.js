@@ -80,11 +80,12 @@ exports.createStudent = catchAsync(async (req, res, next) => {
     if (transport && transport.busId) {
         const newTransport = await StudentTransport.create({
             studentId: null,
-            //regNo: student.regno,
+            regNo: student.regno,
             pickupLocation: transport.pickupLocation,
             // dropOffLocation: transport.dropOffLocation,
             busId: transport.busId,
             fees: transport.fees,
+
         });
         transportId = newTransport._id;
     }
@@ -135,12 +136,13 @@ exports.createStudent = catchAsync(async (req, res, next) => {
 
     await FeesModel.create({
         studentId: newStudent._id,
-
         classId: newStudent.classId,
-        baseFees: studentClass.baseFees,
-        transportationFees: transport?.fees || 0,
-        totalFees:
-            Number(transport.fees || 0) + Number(studentClass.baseFees || 0),
+        fees: [
+            { name: 'Base Fees', fee: studentClass.baseFees },
+            { name: 'Transportation Fees', fee: transport?.fees || 0 }
+        ],
+        total: Number(transport?.fees || 0) + Number(studentClass.baseFees || 0),
+        date: new Date(), // Add date if required
     });
     console.log("fees created");
     res.status(201).json({

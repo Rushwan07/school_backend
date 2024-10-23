@@ -90,8 +90,9 @@ exports.editSubject = catchAsync(async (req, res, next) => {
 
 exports.getStudentSubjects = catchAsync(async (req, res, next) => {
     console.log(req.user.classId);
-    const classs = await Class.findById(req.user.classId).populate("teacherId subjectsId");
-
+    const classs = await Class.find({
+        _id: { $in: req.user.classId }
+    }).populate(['teacherId', 'subjectsId']);
     res.status(200).json({
         status: "success",
         data: {
